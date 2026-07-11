@@ -3,425 +3,117 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bubble HTML 多則對話產生器 (純淨貼圖預覽版)</title>
+  <title>Bubble HTML 對話產生器 (貼圖版)</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #f5f5f7;
-      color: #333;
-      padding: 20px 10px;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background: #fff;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
-    h2 { text-align: center; margin-bottom: 20px; color: #1d1d1f; font-size: 20px; }
-    .global-setting {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      background: #f0f0f2;
-      padding: 12px;
-      border-radius: 8px;
-    }
-    .global-setting div { flex: 1; }
-    label { font-size: 11px; font-weight: bold; color: #666; display: block; margin-bottom: 4px; }
-    input, select, textarea {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #d2d2d7;
-      border-radius: 8px;
-      font-size: 14px;
-      outline: none;
-    }
-    .item-card {
-      border: 2px dashed #dbdbdb;
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 20px;
-      position: relative;
-      background: #fff;
-    }
-    .item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-    .item-title { font-weight: bold; font-size: 14px; color: #333; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background-color: #f5f5f7; padding: 20px 10px; }
+    .container { max-width: 600px; margin: 0 auto; background: #fff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .item-card { border: 2px dashed #dbdbdb; border-radius: 12px; padding: 15px; margin-bottom: 20px; background: #fff; }
     .item-row { display: flex; gap: 10px; margin-bottom: 10px; }
     .item-row div { flex: 1; }
-    
-    /* 貼圖預覽選單 */
-    .sticker-dropdown {
-      position: relative;
-      width: 100%;
-    }
-    .sticker-selected {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px;
-      border: 1px solid #d2d2d7;
-      border-radius: 8px;
-      background: #fff;
-      cursor: pointer;
-    }
-    .sticker-selected img, .sticker-option img {
-      width: 45px;
-      height: 45px;
-      object-fit: contain;
-    }
-    .sticker-options-box {
-      display: none;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      width: 100%;
-      max-height: 220px;
-      overflow-y: auto;
-      background: #fff;
-      border: 1px solid #d2d2d7;
-      border-radius: 8px;
-      z-index: 10;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-    .sticker-options-box.show {
-      display: block;
-    }
-    .sticker-option {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      padding: 8px;
-      cursor: pointer;
-      border-bottom: 1px solid #f5f5f7;
-    }
-    .sticker-option:hover {
-      background: #f5f5f7;
-    }
-
-    .btn-delete {
-      background-color: #e35050;
-      color: white;
-      border: none;
-      padding: 8px;
-      width: 100%;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      font-size: 13px;
-      margin-top: 5px;
-    }
-    .btn-add {
-      background-color: #6e7681;
-      color: white;
-      border: none;
-      padding: 12px;
-      width: 100%;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-bottom: 15px;
-    }
-    .btn-submit {
-      background-color: #ff8fa3;
-      color: white;
-      border: none;
-      padding: 14px;
-      width: 100%;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .success-badge {
-      display: none;
-      text-align: center;
-      color: #2da44e;
-      font-weight: bold;
-      font-size: 13px;
-      margin: 10px 0;
-    }
-    .output-section { margin-top: 20px; }
-    .output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-    .btn-copy {
-      background: #333;
-      color: #fff;
-      border: none;
-      padding: 4px 8px;
-      font-size: 11px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    #resultCode {
-      height: 150px;
-      background: #272822;
-      color: #f8f8f2;
-      font-family: monospace;
-      font-size: 12px;
-    }
+    label { font-size: 11px; font-weight: bold; color: #666; display: block; margin-bottom: 4px; }
+    input, select, textarea { width: 100%; padding: 10px; border: 1px solid #d2d2d7; border-radius: 8px; font-size: 14px; }
+    .sticker-selected { display: flex; align-items: center; gap: 10px; padding: 8px; border: 1px solid #d2d2d7; border-radius: 8px; cursor: pointer; background: #fff; }
+    .sticker-options-box { display: none; border: 1px solid #d2d2d7; max-height: 150px; overflow-y: auto; background: #fff; position: absolute; width: 90%; z-index: 10; }
+    .sticker-options-box.show { display: block; }
+    .sticker-option { display: flex; align-items: center; padding: 5px; cursor: pointer; }
+    .btn-delete { background-color: #e35050; color: white; border: none; padding: 8px; width: 100%; border-radius: 8px; cursor: pointer; margin-top: 5px; }
+    .btn-add { background-color: #6e7681; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 15px; }
+    .btn-submit { background-color: #ff8fa3; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    #resultCode { height: 200px; background: #272822; color: #f8f8f2; font-family: monospace; font-size: 12px; margin-top: 10px; width: 100%; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h2>Bubble 對話代碼產生器</h2>
-  
-  <div class="global-setting">
-    <div>
-      <label>大頭貼頭像設定</label>
-      <select id="globalAvatar">
-        <option value="msg-avatar-1">頭像 1 (日常)</option>
-        <option value="msg-avatar-2">頭像 2 (更新)</option>
-      </select>
-    </div>
-  </div>
-
+  <h2>Bubble 對話產生器 (貼圖版)</h2>
   <div id="itemsContainer"></div>
-
   <button class="btn-add" onclick="addItem()">➕ 新增一則泡泡訊息</button>
-  <button class="btn-submit" onclick="generateAllHTML()">🚀 批次打包聊天泡泡代碼</button>
-  
-  <div class="success-badge" id="successTxt">✅ 打包成功！複製下方代碼去貼在 bubble-sm.html 即可！</div>
-
-  <div class="output-section">
-    <div class="output-header">
-      <label>產出的純泡泡代碼結果：</label>
-      <button class="btn-copy" onclick="copyCode()">複製結果</button>
-    </div>
-    <textarea id="resultCode" readonly placeholder="產出的純對話原始碼會顯示在這裡..."></textarea>
-  </div>
+  <button class="btn-submit" onclick="generateAllHTML()">🚀 打包代碼</button>
+  <textarea id="resultCode" readonly></textarea>
 </div>
 
 <script>
   let itemCount = 0;
-
-  // 10張貼圖定義
-  const stickerData = [
-    { value: "https://ntpcbaechu.github.io/mybubble/sticker/001.png", title: "貼圖 001 (現有)" },
-    { value: "https://ntpcbaechu.github.io/mybubble/sticker/002.png", title: "貼圖 002 (待補)" },
-    { value: "https://ntpcbaechu.github.io/mybubble/sticker/003.png", title: "貼圖 003 (待補)" },
-    { value: "https://ntpcbaechu.github.io/mybubble/sticker/004.png", title: "貼圖 004 (待補)" },
-    { value: "https://ntpcbaechu.github.io/mybubble/sticker/005.png", title: "貼圖 005 (待補)" },
-    { value: "https://ntpcbaechu.github.io/mybubble/sticker/006.png", title: "貼圖 006 (待補)" },
-    { value: "https://ntpcbaechu.github.io/mybubble/sticker/007.png", title: "貼圖 007 (待補)" },
-    { value: "https://ntpcbaechu.github.io/mybubble/sticker/008.png", title: "貼圖 008 (待補)" },
-    { value: "https://ntpcbaechu.github.io/mybubble/sticker/009.png", title: "貼圖 009 (待補)" },
-    { value: "https://ntpcbaechu.github.io/mybubble/sticker/010.png", title: "貼圖 010 (待補)" }
-  ];
+  const stickerData = Array.from({length: 10}, (_, i) => ({
+    value: `https://ntpcbaechu.github.io/mybubble/sticker/00${i+1}.png`,
+    title: `貼圖 00${i+1}`
+  }));
 
   function addItem() {
     itemCount++;
-    const container = document.getElementById('itemsContainer');
     const card = document.createElement('div');
     card.className = 'item-card';
     card.id = `item_${itemCount}`;
-    
     card.innerHTML = `
-      <div class="item-header">
-        <span class="item-title">📦 泡泡訊息 #${itemCount}</span>
-      </div>
       <div class="item-row">
-        <div>
-          <label>時間 (例如:22:15)</label>
-          <input type="text" class="item-time" placeholder="22:15">
-        </div>
-        <div>
-          <label>訊息類型</label>
-          <select class="item-type" onchange="togglePlaceholder(this, ${itemCount})">
-            <option value="text">💬 純文字訊息</option>
-            <option value="image">📸 藝人自拍照大圖</option>
-            <option value="sticker">🧸 貼圖網址 (看圖挑選)</option>
-            <option value="fan">🗣️ 粉絲訊息 (右側)</option>
-            <option value="reply">🔄 藝人回覆粉絲方框</option>
-          </select>
-        </div>
+        <div><label>日期 (YYYY-MM-DD)</label><input type="text" class="item-date" placeholder="2026-07-11"></div>
+        <div><label>時間 (HH:MM)</label><input type="text" class="item-time" placeholder="12:00"></div>
       </div>
-      <div class="content-block-area">
-        <label class="content-label">內容 (長文換行不會被切開)</label>
-        <textarea class="item-content" rows="3" placeholder="請輸入訊息文字..."></textarea>
-      </div>
-      <button class="btn-delete" onclick="removeItem(${itemCount})">🗑️ 刪除此項目</button>
+      <label>類型</label>
+      <select class="item-type" onchange="toggleContent(${itemCount})">
+        <option value="text">💬 純文字</option>
+        <option value="image">📸 大圖</option>
+        <option value="sticker">🧸 貼圖</option>
+        <option value="fan">🗣️ 粉絲訊息</option>
+        <option value="reply">🔄 藝人回覆</option>
+      </select>
+      <div class="content-area" style="margin-top:10px;"></div>
+      <button class="btn-delete" onclick="document.getElementById('item_${itemCount}').remove()">🗑️ 刪除</button>
     `;
-    container.appendChild(card);
+    document.getElementById('itemsContainer').appendChild(card);
+    toggleContent(itemCount);
   }
 
-  function removeItem(id) {
-    const el = document.getElementById(`item_${id}`);
-    if (el) el.remove();
-  }
-
-  function togglePlaceholder(selectEl, id) {
+  function toggleContent(id) {
     const card = document.getElementById(`item_${id}`);
-    const blockArea = card.querySelector('.content-block-area');
+    const area = card.querySelector('.content-area');
+    const type = card.querySelector('.item-type').value;
     
-    if (selectEl.value === 'sticker') {
-      let dropdownHTML = `
-        <label class="content-label">請選擇要使用的貼圖：</label>
+    if (type === 'sticker') {
+      area.innerHTML = `
         <div class="sticker-dropdown">
-          <div class="sticker-selected" onclick="toggleStickerBox(${id})">
-            <img src="${stickerData[0].value}">
-            <span>${stickerData[0].title}</span>
+          <div class="sticker-selected" onclick="this.nextElementSibling.classList.toggle('show')">
+            <img src="${stickerData[0].value}" style="width:30px"> <span>點擊選擇貼圖</span>
           </div>
-          <div class="sticker-options-box" id="stkBox_${id}">
-      `;
-      
-      stickerData.forEach((stk, i) => {
-        dropdownHTML += `
-          <div class="sticker-option" onclick="selectSticker(${id}, '${stk.value}', '${stk.title}')">
-            <img src="${stk.value}">
-            <span>${stk.title}</span>
+          <div class="sticker-options-box">
+            ${stickerData.map(s => `<div class="sticker-option" onclick="selectSticker(${id}, '${s.value}', '${s.title}')"><img src="${s.value}" style="width:30px"> ${s.title}</div>`).join('')}
           </div>
-        `;
-      });
-      
-      dropdownHTML += `
-          </div>
-          <input type="hidden" class="item-content sticker-hidden-val" value="${stickerData[0].value}">
-        </div>
-      `;
-      blockArea.innerHTML = dropdownHTML;
+          <input type="hidden" class="item-content" value="${stickerData[0].value}">
+        </div>`;
     } else {
-      let labelText = '內容 (長文換行不會被切開)';
-      let holderText = '請輸入訊息文字...';
-      
-      if (selectEl.value === 'image') {
-        labelText = '藝人自拍照圖片網址';
-        holderText = 'https://ntpcbaechu.github.io/mybubble/...';
-      } else if (selectEl.value === 'reply') {
-        labelText = '回覆內容 (格式：粉絲的話|藝人的回覆)';
-        holderText = '例如：回覆測試2-1|回覆測試2-2';
-      }
-      
-      blockArea.innerHTML = `
-        <label class="content-label">${labelText}</label>
-        <textarea class="item-content" rows="3" placeholder="${holderText}"></textarea>
-      `;
+      area.innerHTML = `<textarea class="item-content" rows="2" placeholder="輸入內容..."></textarea>`;
     }
-  }
-
-  function toggleStickerBox(id) {
-    const box = document.getElementById(`stkBox_${id}`);
-    if(box) box.classList.toggle('show');
   }
 
   function selectSticker(id, val, title) {
     const card = document.getElementById(`item_${id}`);
-    card.querySelector('.sticker-selected img').src = val;
     card.querySelector('.sticker-selected span').innerText = title;
-    card.querySelector('.sticker-hidden-val').value = val;
-    document.getElementById(`stkBox_${id}`).classList.remove('show');
+    card.querySelector('.item-content').value = val;
+    card.querySelector('.sticker-options-box').classList.remove('show');
   }
-
-  document.addEventListener('click', function(e) {
-    if (!e.target.closest('.sticker-dropdown')) {
-      document.querySelectorAll('.sticker-options-box').forEach(box => box.classList.remove('show'));
-    }
-  });
 
   function generateAllHTML() {
-    const cards = document.querySelectorAll('.item-card');
-    if (cards.length === 0) {
-      alert('請先新增項目！');
-      return;
-    }
-
-    const gAvatar = document.getElementById('globalAvatar').value;
     let finalHTML = "";
-
-    cards.forEach((card, index) => {
-      const time = card.querySelector('.item-time').value.trim() || '00:00';
+    document.querySelectorAll('.item-card').forEach((card, index) => {
+      const d = card.querySelector('.item-date').value || '2026-07-11';
+      const t = card.querySelector('.item-time').value || '12:00';
       const type = card.querySelector('.item-type').value;
-      let content = card.querySelector('.item-content').value;
-      
-      let isContinue = (index > 0 && type !== 'fan') ? ' msg-continue' : '';
+      const content = card.querySelector('.item-content').value;
+      let isC = (index > 0 && type !== 'fan') ? ' msg-continue' : '';
 
-      if (type === 'text') {
-        const formattedText = content.replace(/\n/g, '<br>');
-        finalHTML += `  <div class="msg msg-idol ${gAvatar}${isContinue}">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <div class="msg-bubble search-target">${formattedText}</div>
-        <span class="msg-time">${time}</span>
-      </div>
-    </div>
-  </div>\n`;
-      } 
-      else if (type === 'image') {
-        finalHTML += `  <div class="msg msg-idol ${gAvatar}${isContinue}">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <img class="msg-bubble-img" src="${content.trim()}">
-        <span class="msg-time">${time}</span>
-      </div>
-    </div>
-  </div>\n`;
-      } 
-      else if (type === 'sticker') {
-        finalHTML += `  <div class="msg msg-idol ${gAvatar} msg-sticker${isContinue}">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <div class="msg-bubble">
-          <img class="msg-bubble-img" src="${content.trim()}">
-        </div>
-        <span class="msg-time">${time}</span>
-      </div>
-    </div>
-  </div>\n`;
-      } 
-      else if (type === 'fan') {
-        const formattedText = content.replace(/\n/g, '<br>');
-        finalHTML += `  <div class="msg msg-fan">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <span class="msg-time">${time}</span>
-        <div class="msg-bubble">${formattedText}</div>
-      </div>
-    </div>
-  </div>\n`;
-      } 
+      if (type === 'text') finalHTML += `  <div class="msg msg-idol${isC}" data-date="${d}" data-time="${t}"><div class="msg-body"><div class="msg-wrapper"><div class="msg-bubble search-target">${content.replace(/\n/g, '<br>')}</div><span class="msg-time">${t}</span></div></div></div>\n`;
+      else if (type === 'image') finalHTML += `  <div class="msg msg-idol${isC}" data-date="${d}" data-time="${t}"><div class="msg-body"><div class="msg-wrapper"><img class="msg-bubble-img" src="${content}"><span class="msg-time">${t}</span></div></div></div>\n`;
+      else if (type === 'sticker') finalHTML += `  <div class="msg msg-idol msg-sticker${isC}" data-date="${d}" data-time="${t}"><div class="msg-body"><div class="msg-wrapper"><div class="msg-bubble"><img class="msg-bubble-img" src="${content}"></div><span class="msg-time">${t}</span></div></div></div>\n`;
+      else if (type === 'fan') finalHTML += `  <div class="msg msg-fan" data-date="${d}" data-time="${t}"><div class="msg-body"><div class="msg-wrapper"><span class="msg-time">${t}</span><div class="msg-bubble">${content.replace(/\n/g, '<br>')}</div></div></div></div>\n`;
       else if (type === 'reply') {
-        let fanPart = "粉絲的訊息";
-        let idolPart = "藝人的回覆";
-        if (content.includes('|')) {
-          const parts = content.split('|');
-          fanPart = parts[0].trim();
-          idolPart = parts[1].trim().replace(/\n/g, '<br>');
-        } else {
-          idolPart = content.replace(/\n/g, '<br>');
-        }
-        finalHTML += `  <div class="msg msg-idol ${gAvatar}${isContinue}">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <div class="msg-bubble search-target">
-          <div class="msg-reply-box">
-            <span class="msg-reply-title">ARTIST의 답장</span>
-            <span class="msg-reply-text search-target">${fanPart}</span>
-          </div>
-          ${idolPart}
-        </div>
-        <span class="msg-time">${time}</span>
-      </div>
-    </div>
-  </div>\n`;
+        const [f, i] = content.split('|');
+        finalHTML += `  <div class="msg msg-idol${isC}" data-date="${d}" data-time="${t}"><div class="msg-body"><div class="msg-wrapper"><div class="msg-bubble search-target"><div class="msg-reply-box"><span class="msg-reply-title">ARTIST의 답장</span><span class="msg-reply-text search-target">${f}</span></div>${i.replace(/\n/g, '<br>')}</div><span class="msg-time">${t}</span></div></div></div>\n`;
       }
     });
-
-    document.getElementById('resultCode').value = finalHTML.trim();
-    document.getElementById('successTxt').style.display = 'block';
+    document.getElementById('resultCode').value = finalHTML;
   }
-
-  function copyCode() {
-    const copyText = document.getElementById("resultCode");
-    copyText.select();
-    navigator.clipboard.writeText(copyText.value);
-    alert("泡泡代碼已複製！");
-  }
-
   addItem();
 </script>
-
 </body>
 </html>
