@@ -16,7 +16,6 @@
     
     body {
       padding: 75px 15px 15px 15px; 
-      transition: padding-top 0.3s ease; /* 當搜尋框拉下來時，動態調整肉邊距 */
     }
 
     html::-webkit-scrollbar, body::-webkit-scrollbar {
@@ -42,6 +41,11 @@
       flex-direction: column; 
       align-items: center; 
       justify-content: center; 
+    }
+
+    /* 搜尋中隱藏原本的元素 */
+    .searching .normal-header-element {
+      display: none !important;
     }
 
     .header-title {
@@ -122,46 +126,74 @@
       border-radius: 50%; 
     }
 
-    /* ==================== 🔍 動態搜尋輸入框 ==================== */
-    .search-bar-wrapper {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease, padding 0.3s ease;
+    /* ==================== 🔍 原生滿版搜尋列 ==================== */
+    .search-bar-ui {
+      display: none;
       width: 100%;
-      background: #ffffff;
-      display: flex;
-      gap: 8px;
-      padding: 0 16px;
+      align-items: center;
+      gap: 12px;
+      padding: 2px 0;
     }
-    .search-bar-wrapper.open {
-      max-height: 50px;
-      padding: 8px 16px;
-      border-top: 1px solid #f2f2f2;
+    .searching .search-bar-ui {
+      display: flex !important;
+    }
+    .search-input-wrapper {
+      flex: 1;
+      position: relative;
+      background: #f5f5f7;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+    }
+    .search-input-wrapper ::placeholder {
+      color: #b1b1b5;
+    }
+    .search-input-wrapper .search-icon-inside {
+      width: 12px;
+      height: 12px;
+      border: 1.5px solid #b1b1b5;
+      border-radius: 50%;
+      position: relative;
+      margin-right: 8px;
+    }
+    .search-input-wrapper .search-icon-inside::after {
+      content: '';
+      position: absolute;
+      width: 1.5px;
+      height: 4px;
+      background: #b1b1b5;
+      transform: rotate(-45deg);
+      bottom: -3px;
+      right: -1px;
     }
     .search-input {
       flex: 1;
-      padding: 6px 12px;
-      border: 1px solid #dbdbdb;
-      border-radius: 20px;
-      font-size: 13px;
-      outline: none;
-      background: #f5f5f7;
-    }
-    .search-btn-next {
-      background: #ff8fa3;
-      color: white;
       border: none;
-      padding: 0 12px;
-      border-radius: 15px;
-      font-size: 12px;
-      font-weight: bold;
-      cursor: pointer;
+      background: transparent;
+      font-size: 15px;
+      outline: none;
+      color: #000;
     }
-    /* 高亮搜尋文字的樣式 */
-    .highlight-match {
-      background-color: #fff176 !important;
-      color: #000000 !important;
-      border-radius: 2px;
+    .search-cancel-btn {
+      font-size: 15px;
+      color: #000000;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    /* ==================== 雙色搜尋高亮邏輯 ==================== */
+    /* 1. 其他一般匹配到的字（半透明灰色底） */
+    .bubble-match-gray {
+      background-color: rgba(0, 0, 0, 0.15) !important;
+      color: inherit !important;
+      border-radius: 1px;
+    }
+    /* 2. 目前鎖定選中的那一個字（黑底白字） */
+    .bubble-match-current {
+      background-color: #000000 !important;
+      color: #ffffff !important;
+      border-radius: 1px;
     }
 
     /* ==================== 訊息共通樣式 ==================== */
@@ -187,7 +219,7 @@
     .msg-time { font-size: 9px; color: #a4a4a4; margin: 0 5px; white-space: nowrap; }
     
     .msg-idol:not(.msg-continue) .msg-body::before {
-      content: "민이🤍"; font-size: 11px; color: #4e4e4e; font-weight: 500; margin-bottom: 3px; display: block;
+      content: "민い🤍"; font-size: 11px; color: #4e4e4e; font-weight: 500; margin-bottom: 3px; display: block;
     }
 
     .msg-idol::before {
@@ -207,20 +239,6 @@
 
     .msg-idol .msg-bubble-img {
       width: 100%; max-width: 250px; height: auto; border-radius: 15px; object-fit: cover; display: block;
-    }
-
-    .msg-idol.msg-only-emoji .msg-bubble {
-      background-color: transparent !important; box-shadow: none !important; padding: 0 !important; font-size: 45px; line-height: 1;
-    }
-
-    .msg-idol.msg-sticker .msg-bubble {
-      background-color: transparent !important; 
-      box-shadow: none !important;
-      padding: 0 !important;
-    }
-    .msg-idol.msg-sticker .msg-bubble-img {
-      max-width: 130px; 
-      border-radius: 0; 
     }
 
     .msg-reply-box {
@@ -247,30 +265,61 @@
       background-color: #666666; color: #ffffff; font-size: 14px;
       padding: 9px 13px; border-radius: 15px 4px 15px 15px; line-height: 1.4;
     }
+
+    /* 底部導覽小箭頭控制（還原原生 App 底部切換感覺） */
+    .search-nav-footer {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #ffffff;
+      border-top: 1px solid #dbdbdb;
+      padding: 10px;
+      justify-content: space-around;
+      z-index: 1000;
+    }
+    .searching .search-nav-footer {
+      display: flex !important;
+    }
+    .nav-arrow {
+      font-size: 20px;
+      cursor: pointer;
+      color: #333;
+      padding: 5px 20px;
+    }
   </style> 
 </head>
 
 <body> 
 
   <header class="bubble-header" id="mainHeader">
-    <div class="header-container">
+    <!-- 常規狀態的板頭 -->
+    <div class="header-container normal-header-element">
       <div class="icon-back"></div> 
       <div class="header-title">민이🤍</div> 
       <div class="header-sub">
         <em>bubble</em> <span class="heart-pink">♥</span> + <span id="autoDNum">---</span>
       </div>
       <div class="header-icons">
-        <div class="icon-search" onclick="toggleSearchBar()"></div> 
+        <div class="icon-search" onclick="openSearchUI()"></div> 
         <div class="icon-more"><span></span><span></span></div> 
       </div>
     </div>
-    <div class="search-bar-wrapper" id="searchBar">
-      <input type="text" class="search-input" id="searchInput" placeholder="輸入關鍵字搜尋訊息..." oninput="resetSearchIndex()">
-      <button class="search-btn-next" onclick="executeSearch()">搜尋 / 下一個</button>
+
+    <!-- 🔍 點擊後喚醒的原生滿版搜尋列 -->
+    <div class="search-bar-ui">
+      <div class="search-input-wrapper">
+        <div class="search-icon-inside"></div>
+        <input type="text" class="search-input" id="searchInput" placeholder="채팅 검색" onkeydown="handleSearchKeyDown(event)">
+      </div>
+      <div class="search-cancel-btn" onclick="closeSearchUI()">취소</div>
     </div>
   </header>
 
-  <div class="bubble-date">2024년 8월 19일 月曜日</div> 
+  <!-- 聊天對話區塊 -->
+  <div class="bubble-date">2024년 8 ... 2026年 7月測試段落</div>
+  
   <div class="msg msg-idol msg-avatar-1">
     <div class="msg-body">
       <div class="msg-wrapper">
@@ -280,51 +329,11 @@
     </div>
   </div>
 
-  <div class="bubble-date">2024년 8월 20일 火曜日</div>
   <div class="msg msg-idol msg-avatar-1">
     <div class="msg-body">
       <div class="msg-wrapper">
-        <div class="msg-bubble search-target">잘자!!!</div>
-        <span class="msg-time">01:13</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="msg msg-idol msg-avatar-1 msg-continue">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <div class="msg-bubble search-target">점심 챙겨먹오</div>
-        <span class="msg-time">12:43</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="msg msg-idol msg-avatar-1 msg-sticker msg-continue">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <div class="msg-bubble">
-          <img class="msg-bubble-img" src="https://ntpcbaechu.github.io/mybubble/sticker/001.png">
-        </div>
-        <span class="msg-time">12:44</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="bubble-date">2026.07.10 금요일</div> 
-  <div class="msg msg-idol msg-avatar-1">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <div class="msg-bubble search-target">泡泡測試1</div> 
-        <span class="msg-time">22:15</span> 
-      </div>
-    </div>
-  </div>
-
-  <div class="msg msg-idol msg-avatar-1 msg-continue">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <img class="msg-bubble-img" src="https://ntpcbaechu.github.io/mybubble/profile/2.jpg"> 
-        <span class="msg-time">22:15</span> 
+        <div class="msg-bubble search-target">최대한 나는 공연을 목표로 열심히 재활하고 관리하고 지내고 있어</div>
+        <span class="msg-time">17:09</span>
       </div>
     </div>
   </div>
@@ -332,61 +341,25 @@
   <div class="msg msg-idol msg-avatar-1">
     <div class="msg-body">
       <div class="msg-wrapper">
-        <div class="msg-bubble search-target">
-          <div class="msg-reply-box">
-            <span class="msg-reply-title">ARTIST의 답장</span>
-            <span class="msg-reply-text search-target">回復測試1-1</span>
-          </div>
-          回復測試1-2
-        </div>
-        <span class="msg-time">23:42</span>
+        <div class="msg-bubble search-target">간절하다,,</div>
+        <span class="msg-time">17:10</span>
       </div>
     </div>
   </div>
 
-  <div class="bubble-date">2026.07.11 토요일</div> 
-  <div class="msg msg-idol msg-avatar-2">
+  <div class="msg msg-idol msg-avatar-1">
     <div class="msg-body">
       <div class="msg-wrapper">
-        <div class="msg-bubble search-target">(更新頭像) 泡泡測試3</div> 
-        <span class="msg-time">12:00</span> 
+        <div class="msg-bubble search-target">여름치고 날씨도 생각보다 선선하고 좋다 밥 잘 챙겨먹고 늘 건강하기!!</div>
+        <span class="msg-time">17:21</span>
       </div>
     </div>
   </div>
 
-  <div class="msg msg-idol msg-avatar-2 msg-continue">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <img class="msg-bubble-img" src="https://ntpcbaechu.github.io/mybubble/profile/2.jpg"> 
-        <span class="msg-time">13:15</span> 
-      </div>
-    </div>
-  </div>
-
-  <div class="msg msg-idol msg-avatar-2 msg-sticker msg-continue">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <div class="msg-bubble">
-          <img class="msg-bubble-img" src="https://ntpcbaechu.github.io/mybubble/profile/2.jpg"> 
-        </div>
-        <span class="msg-time">19:03</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="msg msg-idol msg-avatar-2">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <div class="msg-bubble search-target">
-          <div class="msg-reply-box">
-            <span class="msg-reply-title">ARTIST의 답장</span>
-            <span class="msg-reply-text search-target">回復測試2-1</span>
-          </div>
-          回復測試2-2
-        </div>
-        <span class="msg-time">19:42</span>
-      </div>
-    </div>
+  <!-- 原生底部小箭頭切換列 -->
+  <div class="search-nav-footer">
+    <div class="nav-arrow" onclick="navigateSearch(-1)">ㄑ</div>
+    <div class="nav-arrow" onclick="navigateSearch(1)">＞</div>
   </div>
 
   <script>
@@ -400,33 +373,35 @@
     }
     updateBubbleDays();
 
-    // 2. 搜尋列開關切換
-    function toggleSearchBar() {
-      const bar = document.getElementById('searchBar');
-      bar.classList.toggle('open');
-      if (bar.classList.contains('open')) {
-        document.body.style.paddingTop = "115px"; // 展開時推開對話，避免擋字
-        document.getElementById('searchInput').focus();
-      } else {
-        document.body.style.paddingTop = "75px";
-        clearAllHighlights();
-      }
+    // 2. 搜尋 UI 切換控制
+    function openSearchUI() {
+      document.getElementById('mainHeader').classList.add('searching');
+      document.body.classList.add('searching');
+      document.getElementById('searchInput').focus();
     }
 
-    // 3. 搜尋邏輯控制
+    function closeSearchUI() {
+      document.getElementById('mainHeader').classList.remove('searching');
+      document.body.classList.remove('searching');
+      document.getElementById('searchInput').value = '';
+      clearAllHighlights();
+      resetSearchEngine();
+    }
+
+    // 3. 核心搜尋雙底色邏輯
     let currentMatchIndex = -1;
     let matchedElements = [];
     let lastQuery = "";
 
-    function resetSearchIndex() {
+    function resetSearchEngine() {
       currentMatchIndex = -1;
       matchedElements = [];
+      lastQuery = "";
     }
 
     function clearAllHighlights() {
-      const containers = document.querySelectorAll('.search-target');
-      containers.forEach(el => {
-        // 還原先前被拆解高亮的純文字
+      const targets = document.querySelectorAll('.search-target');
+      targets.forEach(el => {
         if (el.hasAttribute('data-original-html')) {
           el.innerHTML = el.getAttribute('data-original-html');
           el.removeAttribute('data-original-html');
@@ -434,61 +409,70 @@
       });
     }
 
-    function executeSearch() {
-      const query = document.getElementById('searchInput').value.trim();
-      if (!query) {
-        alert("請先輸入要搜尋的關鍵字內容喔！");
-        return;
+    function handleSearchKeyDown(e) {
+      if (e.key === 'Enter') {
+        runSearchLogic();
       }
+    }
 
-      // 如果輸入了新關鍵字，重新建立高亮清單
-      if (query !== lastQuery || matchedElements.length === 0) {
+    function runSearchLogic() {
+      const query = document.getElementById('searchInput').value.trim();
+      if (!query) return;
+
+      // 如果輸入全新關鍵字
+      if (query !== lastQuery) {
         clearAllHighlights();
         lastQuery = query;
-        resetSearchIndex();
+        currentMatchIndex = -1;
 
         const targets = document.querySelectorAll('.search-target');
         targets.forEach(el => {
-          // 只針對含有文字節點的部分做精確替換
           let htmlContent = el.innerHTML;
-          if (htmlContent.includes(query) && !el.classList.contains('msg-reply-box')) {
-            // 備份原始 HTML
+          if (htmlContent.includes(query)) {
             if (!el.hasAttribute('data-original-html')) {
               el.setAttribute('data-original-html', htmlContent);
             }
-            // 將關鍵字包裹成高亮標籤
+            // 先全部渲染成「一般灰色匹配底色」
             const regex = new RegExp(`(${escapeRegExp(query)})`, 'g');
-            el.innerHTML = htmlContent.replace(regex, `<mark class="highlight-match">$1</mark>`);
+            el.innerHTML = htmlContent.replace(regex, `<mark class="bubble-match-gray">$1</mark>`);
           }
         });
 
-        // 收集網頁上所有被標註出來的黃色高亮標籤
-        matchedElements = document.querySelectorAll('.highlight-match');
+        matchedElements = document.querySelectorAll('.bubble-match-gray');
         if (matchedElements.length === 0) {
-          alert("找不到符合這個關鍵字的對話訊息！");
+          alert("沒有找到符合的聊天內容");
           return;
         }
       }
 
-      // 輪流跳轉到下一個符合的位置
-      currentMatchIndex++;
-      if (currentMatchIndex >= matchedElements.length) {
-        currentMatchIndex = 0; // 超過最後一個就回到第一個
+      // 跳轉下一個
+      navigateSearch(1);
+    }
+
+    function navigateSearch(direction) {
+      if (matchedElements.length === 0) return;
+
+      // 移除上一個「目前鎖定」的黑底樣式，還原為一般灰底
+      if (currentMatchIndex >= 0 && currentMatchIndex < matchedElements.length) {
+        matchedElements[currentMatchIndex].className = 'bubble-match-gray';
       }
 
-      // 執行平滑滑動跳轉
+      // 計算新指針位置
+      currentMatchIndex += direction;
+      if (currentMatchIndex >= matchedElements.length) currentMatchIndex = 0;
+      if (currentMatchIndex < 0) currentMatchIndex = matchedElements.length - 1;
+
+      // 將當前選中的元素套用「黑底白字」核心樣式
       const targetEl = matchedElements[currentMatchIndex];
+      targetEl.className = 'bubble-match-current';
+
+      // 滑動到可視範圍
       targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      
-      // 給當前看到的那個搜尋目標一個短暫的小閃爍特效提示
-      targetEl.style.outline = "2px solid #ff8fa3";
-      setTimeout(() => { targetEl.style.outline = "none"; }, 1000);
     }
 
     function escapeRegExp(string) {
       return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
   </script>
-
 </body>
 </html>
