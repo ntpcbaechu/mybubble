@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>🤍 昇玟泡泡語法自動生成器 (動態多則打包版) 🤍</title>
+  <style>
+    body { font-family: sans-serif; background: #f0f2f5; padding: 20px; color: #333; }
+    .container { max-width: 750px; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin: 0 auto; }
+    h2 { text-align: center; color: #4e4e4e; margin-bottom: 20px; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; }
+    input[type="text"], input[type="time"], input[type="date"], textarea, select {
+      width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 14px;
+    }
+    textarea { height: 70px; resize: vertical; }
+    .row { display: flex; gap: 15px; }
+    .row .form-group { flex: 1; }
+    
+    /* 動態規格區塊樣式 */
+    .bubble-item { background: #f8f9fa; border: 2px dashed #dee2e6; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+    .item-header { font-weight: bold; color: #4e4e4e; margin-bottom: 10px; border-bottom: 1px solid #dee2e6; padding-bottom: 5px; }
+    
+    .delete-container { text-align: right; margin-top: 10px; }
+    .delete-btn { background: #dc3545; color: white; border: none; padding: 6px 12px; font-size: 12px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .delete-btn:hover { background: #bd2130; }
+
+    .btn-add { background: #6c757d; color: white; margin-bottom: 20px; }
+    .btn-add:hover { background: #5a6268; }
+    .btn-submit { background: #ff8fa3; color: white; font-size: 16px; font-weight: bold; padding: 12px; margin-top: 10px; }
+    .btn-submit:hover { background: #ff758f; }
+    
+    button { width: 100%; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: background 0.2s; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+    
+    .output-header { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; margin-bottom: 5px; }
+    .output-header label { margin: 0; }
+    .copy-btn { background: #4e4e4e; color: white; border: none; padding: 5px 12px; font-size: 12px; border-radius: 4px; cursor: pointer; width: auto; }
+    .copy-btn:hover { background: #333; }
+    #output { width: 100%; height: 160px; background: #282c34; color: #abb2bf; font-family: monospace; padding: 15px; border-radius: 6px; border: none; box-sizing: border-box; font-size: 13px; }
+    
+    #statusText { text-align: center; font-weight: bold; margin-top: 10px; font-size: 14px; }
+    .success { color: #28a745; }
+    .loading { color: #007bff; }
+    .date-badge { background-color: #e2e8f0; padding: 5px 10px; border-radius: 4px; font-size: 12px; display: inline-block; margin-top: 5px; font-weight: normal; color: #4a5568; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>Bubble HTML 多則動態產生器</h2>
+  
+  <div class="row">
+    <div class="form-group">
+      <label>全域訊息日期</label>
+      <input type="date" id="msgDate" value="2026-07-11">
+    </div>
+    <div class="form-group">
+      <label>大頭貼設定</label>
+      <select id="avatarType">
+        <option value="msg-avatar-1">頭像 1 (常規)</option>
+        <option value="msg-avatar-2">頭像 2 (更新版)</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="bubbleList">
+    </div>
+
+  <button type="button" class="btn-add" onclick="addBubbleItem()">➕ 新增一則泡泡規格</button>
+  <button type="button" class="btn-submit" id="submitBtn" onclick="processAllBubbles()">🚀 依照順序批次同步到 Google 表單</button>
+  
+  <div id="statusText"></div>
+
+  <div class="output-header">
+    <label>最後一則產出 HTML 結果：</label>
+    <button type="button" class="copy-btn" onclick="copyCode()">複製</button>
+  </div>
+  <textarea id="output" readonly placeholder="等待生成..."></textarea>
+
+  <div style="text-align: center; margin-top: 15px;">
+    <span class="date-badge" id="lastDateBadge">目前系統記憶的日期：無</span>
+    <br>
+    <button style="width: auto; background: #8e8e93; font-size: 11px; padding: 4px 8px; margin-top: 5px;" onclick="resetDateMemory()">🔄 重設日期記憶</button>
+  </div>
+</div>
+
+<script>
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbyEEc-vKVNfa5YQcVJ3ldpgNLoUwfJUG4bC-qU4vtzwEQ6CMQBqvwgpuuhP36ntymHj/exec";
+  let itemCounter = 0;
+
+  window.onload = function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('msgDate').value = today;
+    updateBadge();
+    addBubbleItem();
+  };
+
+  function addBubbleItem() {
+    itemCounter++;
+    const bubbleList = document.getElementById('bubbleList');
+    
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'bubble-item';
+    itemDiv.id = `item_${itemCounter}`;
+    
+    itemDiv.innerHTML = `
+      <div class="item-header">📦 泡泡項目 #${itemCounter}</div>
+      
+      <div class="row">
+        <div class="form-group" style="flex: 0.5;">
+          <label>時間(例如:20:45,09:15)</label>
+          <input type="text" class="item-time" value="20:45" placeholder="HH:MM" maxlength="5">
+        </div>
+        <div class="form-group" style="flex: 0.5;">
+          <label>類型</label>
+          <select class="item-type" onchange="toggleReplyBox(${itemCounter})">
+            <option value="text">💬 純文字訊息</option>
+            <option value="image">📸 圖片網址</option>
+            <option value="sticker">🧸 貼圖網址</option>
+            <option value="reply">🔄 回覆粉絲</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group reply-field" id="reply_field_${itemCounter}" style="display:none;">
+        <label>被引用的粉絲留言 (USER)</label>
+        <textarea class="item-reply-text" placeholder="請輸入內容..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="content-label">內容 (長文換行不會被切開)</label>
+        <textarea class="item-content" placeholder="請輸入內容..."></textarea>
+      </div>
+
+      <div class="delete-container">
+        <button type="button" class="delete-btn" onclick="removeBubbleItem(${itemCounter})">🗑️ 刪除此項目</button>
+      </div>
+    `;
+    
+    bubbleList.appendChild(itemDiv);
+  }
+
+  function removeBubbleItem(id) {
+    const item = document.getElementById(`item_${id}`);
+    if (item) item.remove();
+  }
+
+  function toggleReplyBox(id) {
+    const type = document.querySelector(`#item_${id} .item-type`).value;
+    document.getElementById(`reply_field_${id}`).style.display = (type === 'reply') ? 'block' : 'none';
+  }
+
+  function convertToKrTime(twTimeStr) {
+    if(!twTimeStr || !twTimeStr.includes(':')) return "00:00";
+    let [hours, minutes] = twTimeStr.split(':').map(Number);
+    if (isNaN(hours) || isNaN(minutes)) return "00:00";
+    hours = (hours + 1) % 24;
+    return String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0');
+  }
+
+  function getKrDateString(dateStr) {
+    if(!dateStr) return "";
+    const weeks = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+    const dateObj = new Date(dateStr);
+    return `${dateObj.getFullYear()}년 ${dateObj.getMonth() + 1}월 ${dateObj.getDate()}일 ${weeks[dateObj.getDay()]}`;
+  }
+
+  function updateBadge() {
+    const lastDate = sessionStorage.getItem('last_bubble_date');
+    const badge = document.getElementById('lastDateBadge');
+    badge.innerText = lastDate ? "目前系統記憶的日期：" + lastDate + " (相同日期不會重覆產出日期線)" : "目前系統記憶的日期：無 (下一則會自動新增日期線)";
+  }
+
+  function resetDateMemory() {
+    sessionStorage.removeItem('last_bubble_date');
+    updateBadge();
+    alert('日期記憶已重置！');
+  }
+
+  async function processAllBubbles() {
+    const submitBtn = document.getElementById('submitBtn');
+    const statusText = document.getElementById('statusText');
+    const currentDateInput = document.getElementById('msgDate').value;
+    const items = document.querySelectorAll('.bubble-item');
+    
+    if(!currentDateInput) { alert('請先選擇日期喔！'); return; }
+    if(items.length === 0) { alert('目前沒有任何泡泡規格，請先點擊新增！'); return; }
+
+    submitBtn.disabled = true;
+    statusText.className = "loading";
+    statusText.innerText = "⏳ 正在處理智慧換日...";
+
+    try {
+      const lastDate = sessionStorage.getItem('last_bubble_date');
+      
+      if (lastDate !== currentDateInput) {
+        statusText.innerText = "📅 偵測到新日期，正在自動塞入韓文日期線...";
+        const krDateStr = getKrDateString(currentDateInput);
+        const dateHtml = `  \n  <div class="bubble-date">${krDateStr}</div>`;
+        
+        await uploadToSheets({
+          type: "📅 日期線",
+          time: "-",
+          content: krDateStr,
+          html: dateHtml
+        });
+        
+        sessionStorage.setItem('last_bubble_date', currentDateInput);
+        updateBadge();
+      }
+
+      const avatar = document.getElementById('avatarType').value;
+
+      for (let i = 0; i < items.length; i++) {
+        statusText.innerText = `⏳ 正在同步第 (${i + 1}/${items.length}) 則視窗規格...`;
+        
+        const item = items[i];
+        const twTime = item.querySelector('.item-time').value.trim();
+        const krTime = convertToKrTime(twTime);
+        const type = item.querySelector('.item-type').value;
+        const content = item.querySelector('.item-content').value.trim();
+        const replyText = item.querySelector('.item-reply-text') ? item.querySelector('.item-reply-text').value.trim() : "";
+
+        if(!content) continue;
+
+        const isContinue = (i > 0); 
+        const htmlResult = generateSingleHTML(type, krTime, avatar, isContinue, content, replyText);
+        
+        let typeName = "💬 文字";
+        let logContent = content;
+        if(type==='image') typeName="📸 圖片";
+        if(type==='sticker') typeName="🧸 貼圖";
+        if(type==='reply') {
+          typeName="🔄 回覆";
+          logContent = `【粉絲】\n${replyText}\n\n【藝人】\n${content}`;
+        }
+
+        await uploadToSheets({
+          type: typeName,
+          time: krTime,
+          content: logContent,
+          html: htmlResult
+        });
+      }
+
+      statusText.className = "success";
+      statusText.innerText = `✅ 成功！已完美同步畫面上共 ${items.length} 個規格視窗至試算表！`;
+
+    } catch (err) {
+      console.error(err);
+      statusText.className = "";
+      statusText.innerText = "❌ 發生連線錯誤";
+    } finally {
+      submitBtn.disabled = false;
+    }
+  }
+
+  function generateSingleHTML(type, krTime, avatar, isContinue, content, replyText) {
+    const output = document.getElementById('output');
+    let classList = `msg msg-idol ${avatar}`;
+    if (isContinue) classList += ' msg-continue';
+    if (type === 'sticker') classList += ' msg-sticker';
+
+    const formattedContent = content.replace(/\n/g, '<br>');
+    const formattedReply = replyText.replace(/\n/g, '<br>');
+
+    let htmlResult = "";
+    if (type === 'text') {
+      htmlResult = `  \n  <div class="${classList}">\n    <div class="msg-body">\n      <div class="msg-wrapper">\n        <div class="msg-bubble">${formattedContent}</div>\n        <span class="msg-time">${krTime}</span>\n      </div>\n    </div>\n  </div>`;
+    } else if (type === 'image') {
+      htmlResult = `  \n  <div class="${classList}">\n    <div class="msg-body">\n      <div class="msg-wrapper">\n        <img class="msg-bubble-img" src="${content}">\n        <span class="msg-time">${krTime}</span>\n      </div>\n    </div>\n  </div>`;
+    } else if (type === 'sticker') {
+      htmlResult = `  \n  <div class="${classList}">\n    <div class="msg-body">\n      <div class="msg-wrapper">\n        <div class="msg-bubble">\n          <img class="msg-bubble-img" src="${content}">\n        </div>\n        <span class="msg-time">${krTime}</span>\n      </div>\n    </div>\n  </div>`;
+    } else if (type === 'reply') {
+      htmlResult = `  \n  <div class="${classList}">\n    <div class="msg-body">\n      <div class="msg-wrapper">\n        <div class="msg-bubble">\n          <div class="msg-reply-box">\n            <span class="msg-reply-title">ARTIST의 답장</span>\n            <span class="msg-reply-text">${formattedReply}</span>\n          </div>\n          ${formattedContent}\n        </div>\n        <span class="msg-time">${krTime}</span>\n      </div>\n    </div>\n  </div>`;
+    }
+
+    output.value = htmlResult;
+    return htmlResult;
+  }
+
+  function uploadToSheets(payload) {
+    return fetch(GAS_URL, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    }).then(res => res.json())
+    .then(data => {
+      if(data.result !== "success") throw new Error("GAS error");
+      return true;
+    });
+  }
+
+  function copyCode() {
+    const output = document.getElementById('output');
+    output.select();
+    document.execCommand('copy');
+    alert('代碼已複製！');
+  }
+</script>
+
+</body>
+</html>
