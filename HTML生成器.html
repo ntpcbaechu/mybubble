@@ -19,7 +19,8 @@
     .sticker-option { display: flex; align-items: center; padding: 5px; cursor: pointer; }
     .btn-delete { background-color: #e35050; color: white; border: none; padding: 8px; width: 100%; border-radius: 8px; cursor: pointer; margin-top: 5px; }
     .btn-add { background-color: #6e7681; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 15px; }
-    .btn-submit { background-color: #ff8fa3; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .btn-submit { background-color: #ff8fa3; color: white; border: none; padding: 14px; width: 48%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .btn-copy { background-color: #5856d6; color: white; border: none; padding: 14px; width: 48%; border-radius: 8px; font-weight: bold; cursor: pointer; }
     #resultCode { height: 200px; background: #272822; color: #f8f8f2; font-family: monospace; font-size: 12px; margin-top: 10px; width: 100%; }
   </style>
 </head>
@@ -29,12 +30,16 @@
   <h2>Bubble 對話產生器 (貼圖版)</h2>
   <div id="itemsContainer"></div>
   <button class="btn-add" onclick="addItem()">➕ 新增一則泡泡訊息</button>
-  <button class="btn-submit" onclick="generateAllHTML()">🚀 打包代碼</button>
+  <div style="display:flex; justify-content:space-between; gap: 10px;">
+    <button class="btn-submit" onclick="generateAllHTML()">🚀 打包代碼</button>
+    <button class="btn-copy" onclick="copyResult()">📋 複製代碼</button>
+  </div>
   <textarea id="resultCode" readonly></textarea>
 </div>
 
 <script>
   let itemCount = 0;
+  const today = new Date().toISOString().split('T')[0];
   const stickerData = Array.from({length: 10}, (_, i) => ({
     value: `https://ntpcbaechu.github.io/mybubble/sticker/00${i+1}.png`,
     title: `貼圖 00${i+1}`
@@ -47,8 +52,8 @@
     card.id = `item_${itemCount}`;
     card.innerHTML = `
       <div class="item-row">
-        <div><label>日期 (YYYY-MM-DD)</label><input type="text" class="item-date" placeholder="2026-07-11"></div>
-        <div><label>時間 (HH:MM)</label><input type="text" class="item-time" placeholder="12:00"></div>
+        <div><label>日期</label><input type="date" class="item-date" value="${today}"></div>
+        <div><label>時間 (HH:MM)</label><input type="time" class="item-time" value="12:00"></div>
       </div>
       <label>類型</label>
       <select class="item-type" onchange="toggleContent(${itemCount})">
@@ -96,8 +101,8 @@
   function generateAllHTML() {
     let finalHTML = "";
     document.querySelectorAll('.item-card').forEach((card, index) => {
-      const d = card.querySelector('.item-date').value || '2026-07-11';
-      const t = card.querySelector('.item-time').value || '12:00';
+      const d = card.querySelector('.item-date').value;
+      const t = card.querySelector('.item-time').value;
       const type = card.querySelector('.item-type').value;
       const content = card.querySelector('.item-content').value;
       let isC = (index > 0 && type !== 'fan') ? ' msg-continue' : '';
@@ -108,11 +113,19 @@
       else if (type === 'fan') finalHTML += `  <div class="msg msg-fan" data-date="${d}" data-time="${t}"><div class="msg-body"><div class="msg-wrapper"><span class="msg-time">${t}</span><div class="msg-bubble">${content.replace(/\n/g, '<br>')}</div></div></div></div>\n`;
       else if (type === 'reply') {
         const [f, i] = content.split('|');
-        finalHTML += `  <div class="msg msg-idol${isC}" data-date="${d}" data-time="${t}"><div class="msg-body"><div class="msg-wrapper"><div class="msg-bubble search-target"><div class="msg-reply-box"><span class="msg-reply-title">ARTIST의 답장</span><span class="msg-reply-text search-target">${f}</span></div>${i.replace(/\n/g, '<br>')}</div><span class="msg-time">${t}</span></div></div></div>\n`;
+        finalHTML += `  <div class="msg msg-idol${isC}" data-date="${d}" data-time="${t}"><div class="msg-body"><div class="msg-wrapper"><div class="msg-bubble search-target"><div class="msg-reply-box"><span class="msg-reply-title">ARTIST의 답장</span><span class="msg-reply-text search-target">${f || ''}</span></div>${(i || '').replace(/\n/g, '<br>')}</div><span class="msg-time">${t}</span></div></div></div>\n`;
       }
     });
     document.getElementById('resultCode').value = finalHTML;
   }
+
+  function copyResult() {
+    const code = document.getElementById('resultCode');
+    code.select();
+    document.execCommand('copy');
+    alert('已複製到剪貼簿！');
+  }
+  
   addItem();
 </script>
 </body>
