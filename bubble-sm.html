@@ -21,6 +21,11 @@
     html::-webkit-scrollbar, body::-webkit-scrollbar {
       display: none;
     }
+    
+    /* 修改此區塊：新增 avatar-none 定義 */
+    .msg-idol.msg-avatar-1::before { background-image: url("https://ntpcbaechu.github.io/mybubble/profile/1.JPG"); }
+    .msg-idol.msg-avatar-2::before { background-image: url("https://ntpcbaechu.github.io/mybubble/profile/2.jpg"); }
+    .msg-idol.msg-avatar-none::before { background-image: url("https://ntpcbaechu.github.io/mybubble/profile/none.jpg"); }
 
     /* 板頭 Header 樣式 */
     .bubble-header {
@@ -199,6 +204,22 @@
       targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
     function escapeRegExp(string) { return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+    
+        // 自動分配頭像邏輯 (放在 script 區塊的最下方)
+    document.querySelectorAll('.msg-idol').forEach(msg => {
+      const d = msg.getAttribute('data-date');
+      const t = msg.getAttribute('data-time') ? msg.getAttribute('data-time').replace(':', '') : '0000';
+      if (!d) return; 
+
+      if (d < '2026-05-01') {
+        msg.classList.add('msg-avatar-1');
+      } else if (d === '2026-05-01' && t >= '1727' && t <= '1728') {
+        msg.classList.add('msg-avatar-none');
+      } else {
+        msg.classList.add('msg-avatar-2');
+      }
+    });
+
   </script>
 </body>
 </html>
