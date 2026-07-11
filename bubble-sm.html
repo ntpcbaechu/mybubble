@@ -61,7 +61,7 @@
       text-align: center; /* 文字置中 */
     }
 
-    /* 名字下面那行小字（bubble ♥ + 9999） */
+    /* 名字下面那行小字（bubble ♥ + 動態天數） */
     .header-sub {
       font-size: 11px; /* 字體縮小到 11 像素 */
       font-weight: bold; /* 加粗 */
@@ -92,7 +92,7 @@
       width: 12px; /* 寬 12 像素的正方形 */
       height: 12px; /* 高 12 像素的正方形 */
       border-top: 2px solid #000;  /* 幫正方形的「上邊」畫一條 2px 黑線 */
-      border-left: 2px solid #000; /* 幫正方形的「左邊」畫一條 2px 黑線 */
+      border-left: 2px solid #000; /* 幫正方形的「左邊’畫一條 2px 黑線 */
       transform: rotate(-45deg); /* 【旋轉魔法】逆時針轉 45 度，原本的┌型就會變指向左邊的「＜」！ */
       cursor: pointer; /* 滑鼠移上去時自動變成點擊的手指 */
     }
@@ -250,7 +250,7 @@
       <div class="icon-back"></div> 
       <div class="header-title">민이🤍</div> 
       <div class="header-sub">
-        <em>bubble</em> <span class="heart-pink">♥</span> + 9999 
+        <em>bubble</em> <span class="heart-pink">♥</span> + <span id="autoDNum">---</span>
       </div>
       <div class="header-icons">
         <div class="icon-search"></div> 
@@ -259,7 +259,7 @@
     </div>
   </header>
 
-  <div class="bubble-date">2024년 8월 19일 월요일</div> 
+  <div class="bubble-date">2024년 8월 19일 月曜日</div> 
   <div class="msg msg-idol msg-avatar-1">
     <div class="msg-body">
       <div class="msg-wrapper">
@@ -269,7 +269,7 @@
     </div>
   </div>
 
-  <div class="bubble-date">2024년 8월 20일 화요일</div>
+  <div class="bubble-date">2024년 8월 20일 火曜日</div>
   
   <div class="msg msg-idol msg-avatar-1">
     <div class="msg-body">
@@ -291,7 +291,7 @@
   </div>
 
   
-  <div class="msg msg-idol msg-avatar-1 msg-continue msg-sticker">
+  <div class="msg msg-idol msg-avatar-1 msg-sticker msg-continue">
     <div class="msg-body">
       <div class="msg-wrapper">
         <div class="msg-bubble">
@@ -382,6 +382,17 @@
       </div>
     </div>
   </div>
+
+  <script>
+    function updateBubbleDays() {
+      const startDate = new Date('2024-08-19');
+      const today = new Date();
+      const timeDiff = today.getTime() - startDate.getTime();
+      const daysDiff = Math.floor(timeDiff / (1000 * 3600 * 24)) + 1;
+      document.getElementById('autoDNum').innerText = daysDiff;
+    }
+    updateBubbleDays();
+  </script>
 
 </body>
 </html>
