@@ -183,13 +183,11 @@
     }
 
     /* ==================== 雙色搜尋高亮邏輯 ==================== */
-    /* 1. 其他一般匹配到的字（半透明灰色底） */
     .bubble-match-gray {
       background-color: rgba(0, 0, 0, 0.15) !important;
       color: inherit !important;
       border-radius: 1px;
     }
-    /* 2. 目前鎖定選中的那一個字（黑底白字） */
     .bubble-match-current {
       background-color: #000000 !important;
       color: #ffffff !important;
@@ -219,7 +217,7 @@
     .msg-time { font-size: 9px; color: #a4a4a4; margin: 0 5px; white-space: nowrap; }
     
     .msg-idol:not(.msg-continue) .msg-body::before {
-      content: "민い🤍"; font-size: 11px; color: #4e4e4e; font-weight: 500; margin-bottom: 3px; display: block;
+      content: "민이🤍"; font-size: 11px; color: #4e4e4e; font-weight: 500; margin-bottom: 3px; display: block;
     }
 
     .msg-idol::before {
@@ -239,6 +237,16 @@
 
     .msg-idol .msg-bubble-img {
       width: 100%; max-width: 250px; height: auto; border-radius: 15px; object-fit: cover; display: block;
+    }
+
+    .msg-idol.msg-sticker .msg-bubble {
+      background-color: transparent !important; 
+      box-shadow: none !important;
+      padding: 0 !important;
+    }
+    .msg-idol.msg-sticker .msg-bubble-img {
+      max-width: 130px; 
+      border-radius: 0; 
     }
 
     .msg-reply-box {
@@ -266,7 +274,6 @@
       padding: 9px 13px; border-radius: 15px 4px 15px 15px; line-height: 1.4;
     }
 
-    /* 底部導覽小箭頭控制（還原原生 App 底部切換感覺） */
     .search-nav-footer {
       display: none;
       position: fixed;
@@ -294,10 +301,9 @@
 <body> 
 
   <header class="bubble-header" id="mainHeader">
-    <!-- 常規狀態的板頭 -->
     <div class="header-container normal-header-element">
       <div class="icon-back"></div> 
-      <div class="header-title">민이🤍</div> 
+      <div class="header-title">민い🤍</div> 
       <div class="header-sub">
         <em>bubble</em> <span class="heart-pink">♥</span> + <span id="autoDNum">---</span>
       </div>
@@ -307,7 +313,6 @@
       </div>
     </div>
 
-    <!-- 🔍 點擊後喚醒的原生滿版搜尋列 -->
     <div class="search-bar-ui">
       <div class="search-input-wrapper">
         <div class="search-icon-inside"></div>
@@ -317,9 +322,7 @@
     </div>
   </header>
 
-  <!-- 聊天對話區塊 -->
-  <div class="bubble-date">2024년 8 ... 2026年 7月測試段落</div>
-  
+  <div class="bubble-date">2024년 8월 19일 월요일</div> 
   <div class="msg msg-idol msg-avatar-1">
     <div class="msg-body">
       <div class="msg-wrapper">
@@ -329,11 +332,51 @@
     </div>
   </div>
 
+  <div class="bubble-date">2024년 8월 20일 화요일</div>
   <div class="msg msg-idol msg-avatar-1">
     <div class="msg-body">
       <div class="msg-wrapper">
-        <div class="msg-bubble search-target">최대한 나는 공연을 목표로 열심히 재활하고 관리하고 지내고 있어</div>
-        <span class="msg-time">17:09</span>
+        <div class="msg-bubble search-target">잘자!!!</div>
+        <span class="msg-time">01:13</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="msg msg-idol msg-avatar-1 msg-continue">
+    <div class="msg-body">
+      <div class="msg-wrapper">
+        <div class="msg-bubble search-target">점심 챙겨먹오</div>
+        <span class="msg-time">12:43</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="msg msg-idol msg-avatar-1 msg-sticker msg-continue">
+    <div class="msg-body">
+      <div class="msg-wrapper">
+        <div class="msg-bubble">
+          <img class="msg-bubble-img" src="https://ntpcbaechu.github.io/mybubble/sticker/001.png">
+        </div>
+        <span class="msg-time">12:44</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="bubble-date">2026.07.10 금요일</div> 
+  <div class="msg msg-idol msg-avatar-1">
+    <div class="msg-body">
+      <div class="msg-wrapper">
+        <div class="msg-bubble search-target">泡泡測試1</div> 
+        <span class="msg-time">22:15</span> 
+      </div>
+    </div>
+  </div>
+
+  <div class="msg msg-idol msg-avatar-1 msg-continue">
+    <div class="msg-body">
+      <div class="msg-wrapper">
+        <img class="msg-bubble-img" src="https://ntpcbaechu.github.io/mybubble/profile/2.jpg"> 
+        <span class="msg-time">22:15</span> 
       </div>
     </div>
   </div>
@@ -341,22 +384,63 @@
   <div class="msg msg-idol msg-avatar-1">
     <div class="msg-body">
       <div class="msg-wrapper">
-        <div class="msg-bubble search-target">간절하다,,</div>
-        <span class="msg-time">17:10</span>
+        <div class="msg-bubble search-target">
+          <div class="msg-reply-box">
+            <span class="msg-reply-title">ARTIST의 답장</span>
+            <span class="msg-reply-text search-target">回復測試1-1</span>
+          </div>
+          回復測試1-2
+        </div>
+        <span class="msg-time">23:42</span>
       </div>
     </div>
   </div>
 
-  <div class="msg msg-idol msg-avatar-1">
+  <div class="bubble-date">2026.07.11 토요일</div> 
+  <div class="msg msg-idol msg-avatar-2">
     <div class="msg-body">
       <div class="msg-wrapper">
-        <div class="msg-bubble search-target">여름치고 날씨도 생각보다 선선하고 좋다 밥 잘 챙겨먹고 늘 건강하기!!</div>
-        <span class="msg-time">17:21</span>
+        <div class="msg-bubble search-target">(更新頭像) 泡泡測試3</div> 
+        <span class="msg-time">12:00</span> 
       </div>
     </div>
   </div>
 
-  <!-- 原生底部小箭頭切換列 -->
+  <div class="msg msg-idol msg-avatar-2 msg-continue">
+    <div class="msg-body">
+      <div class="msg-wrapper">
+        <img class="msg-bubble-img" src="https://ntpcbaechu.github.io/mybubble/profile/2.jpg"> 
+        <span class="msg-time">13:15</span> 
+      </div>
+    </div>
+  </div>
+
+  <div class="msg msg-idol msg-avatar-2 msg-sticker msg-continue">
+    <div class="msg-body">
+      <div class="msg-wrapper">
+        <div class="msg-bubble">
+          <img class="msg-bubble-img" src="https://ntpcbaechu.github.io/mybubble/profile/2.jpg"> 
+        </div>
+        <span class="msg-time">19:03</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="msg msg-idol msg-avatar-2">
+    <div class="msg-body">
+      <div class="msg-wrapper">
+        <div class="msg-bubble search-target">
+          <div class="msg-reply-box">
+            <span class="msg-reply-title">ARTIST의 답장</span>
+            <span class="msg-reply-text search-target">回復測試2-1</span>
+          </div>
+          回復測試2-2
+        </div>
+        <span class="msg-time">19:42</span>
+      </div>
+    </div>
+  </div>
+
   <div class="search-nav-footer">
     <div class="nav-arrow" onclick="navigateSearch(-1)">ㄑ</div>
     <div class="nav-arrow" onclick="navigateSearch(1)">＞</div>
@@ -419,7 +503,6 @@
       const query = document.getElementById('searchInput').value.trim();
       if (!query) return;
 
-      // 如果輸入全新關鍵字
       if (query !== lastQuery) {
         clearAllHighlights();
         lastQuery = query;
@@ -432,7 +515,6 @@
             if (!el.hasAttribute('data-original-html')) {
               el.setAttribute('data-original-html', htmlContent);
             }
-            // 先全部渲染成「一般灰色匹配底色」
             const regex = new RegExp(`(${escapeRegExp(query)})`, 'g');
             el.innerHTML = htmlContent.replace(regex, `<mark class="bubble-match-gray">$1</mark>`);
           }
@@ -445,28 +527,23 @@
         }
       }
 
-      // 跳轉下一個
       navigateSearch(1);
     }
 
     function navigateSearch(direction) {
       if (matchedElements.length === 0) return;
 
-      // 移除上一個「目前鎖定」的黑底樣式，還原為一般灰底
       if (currentMatchIndex >= 0 && currentMatchIndex < matchedElements.length) {
         matchedElements[currentMatchIndex].className = 'bubble-match-gray';
       }
 
-      // 計算新指針位置
       currentMatchIndex += direction;
       if (currentMatchIndex >= matchedElements.length) currentMatchIndex = 0;
       if (currentMatchIndex < 0) currentMatchIndex = matchedElements.length - 1;
 
-      // 將當前選中的元素套用「黑底白字」核心樣式
       const targetEl = matchedElements[currentMatchIndex];
       targetEl.className = 'bubble-match-current';
 
-      // 滑動到可視範圍
       targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
