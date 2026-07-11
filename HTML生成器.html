@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bubble HTML 對話產生器 (貼圖版)</title>
+  <title>Bubble HTML 對話產生器 (完整整合版)</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background-color: #f5f5f7; padding: 20px 10px; }
@@ -19,27 +19,32 @@
     .sticker-option { display: flex; align-items: center; padding: 5px; cursor: pointer; }
     .btn-delete { background-color: #e35050; color: white; border: none; padding: 8px; width: 100%; border-radius: 8px; cursor: pointer; margin-top: 5px; }
     .btn-add { background-color: #6e7681; color: white; border: none; padding: 12px; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 15px; }
-    .btn-submit { background-color: #ff8fa3; color: white; border: none; padding: 14px; width: 48%; border-radius: 8px; font-weight: bold; cursor: pointer; }
-    .btn-copy { background-color: #5856d6; color: white; border: none; padding: 14px; width: 48%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .btn-submit { background-color: #ff8fa3; color: white; border: none; padding: 14px; width: 30%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .btn-copy { background-color: #5856d6; color: white; border: none; padding: 14px; width: 30%; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    .btn-sync { background-color: #28a745; color: white; border: none; padding: 14px; width: 30%; border-radius: 8px; font-weight: bold; cursor: pointer; }
     #resultCode { height: 200px; background: #272822; color: #f8f8f2; font-family: monospace; font-size: 12px; margin-top: 10px; width: 100%; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h2>Bubble 對話產生器 (貼圖版)</h2>
+  <h2>Bubble 對話產生器 (完整整合版)</h2>
   <div id="itemsContainer"></div>
   <button class="btn-add" onclick="addItem()">➕ 新增一則泡泡訊息</button>
-  <div style="display:flex; justify-content:space-between; gap: 10px;">
-    <button class="btn-submit" onclick="generateAllHTML()">🚀 打包代碼</button>
-    <button class="btn-copy" onclick="copyResult()">📋 複製代碼</button>
+  
+  <div style="display:flex; justify-content:space-between; gap: 5px; margin-top: 10px;">
+    <button class="btn-submit" onclick="generateAllHTML()">🚀 打包</button>
+    <button class="btn-copy" onclick="copyResult()">📋 複製</button>
+    <button class="btn-sync" onclick="syncAllToSheet()">☁️ 同步</button>
   </div>
+  
   <textarea id="resultCode" readonly></textarea>
 </div>
 
 <script>
   let itemCount = 0;
   const today = new Date().toISOString().split('T')[0];
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz_UpICDs7YyDN2-PyZmpomwAeTV1hP-LQrVBY/exec';
   const stickerData = Array.from({length: 10}, (_, i) => ({
     value: `https://ntpcbaechu.github.io/mybubble/sticker/00${i+1}.png`,
     title: `貼圖 00${i+1}`
@@ -74,21 +79,15 @@
     const card = document.getElementById(`item_${id}`);
     const area = card.querySelector('.content-area');
     const type = card.querySelector('.item-type').value;
-    
-    if (type === 'sticker') {
-      area.innerHTML = `
-        <div class="sticker-dropdown">
-          <div class="sticker-selected" onclick="this.nextElementSibling.classList.toggle('show')">
-            <img src="${stickerData[0].value}" style="width:30px"> <span>點擊選擇貼圖</span>
-          </div>
-          <div class="sticker-options-box">
-            ${stickerData.map(s => `<div class="sticker-option" onclick="selectSticker(${id}, '${s.value}', '${s.title}')"><img src="${s.value}" style="width:30px"> ${s.title}</div>`).join('')}
-          </div>
-          <input type="hidden" class="item-content" value="${stickerData[0].value}">
-        </div>`;
-    } else {
-      area.innerHTML = `<textarea class="item-content" rows="2" placeholder="輸入內容..."></textarea>`;
-    }
+    area.innerHTML = (type === 'sticker') ? `
+      <div class="sticker-selected" onclick="this.nextElementSibling.classList.toggle('show')">
+        <img src="${stickerData[0].value}" style="width:30px"> <span>點擊選擇貼圖</span>
+      </div>
+      <div class="sticker-options-box">
+        ${stickerData.map(s => `<div class="sticker-option" onclick="selectSticker(${id}, '${s.value}', '${s.title}')"><img src="${s.value}" style="width:30px"> ${s.title}</div>`).join('')}
+      </div>
+      <input type="hidden" class="item-content" value="${stickerData[0].value}">` 
+      : `<textarea class="item-content" rows="2" placeholder="輸入內容..."></textarea>`;
   }
 
   function selectSticker(id, val, title) {
@@ -117,13 +116,31 @@
       }
     });
     document.getElementById('resultCode').value = finalHTML;
+    return finalHTML;
+  }
+
+  function syncAllToSheet() {
+    const finalHTML = generateAllHTML();
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'full_sync',
+        time: new Date().toLocaleTimeString(),
+        content: '全量同步',
+        html: finalHTML,
+        timestamp: new Date().toISOString()
+      })
+    }).then(() => alert('✅ 已成功同步至 Google Sheet！'))
+      .catch(e => { console.error(e); alert('❌ 同步失敗'); });
   }
 
   function copyResult() {
     const code = document.getElementById('resultCode');
     code.select();
     document.execCommand('copy');
-    alert('已複製到剪貼簿！');
+    alert('📋 已複製到剪貼簿！');
   }
   
   addItem();
