@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bubble HTML 多則動態產生器</title>
+  <title>Bubble HTML 多則對話產生器 (純淨貼圖預覽版)</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -51,6 +51,56 @@
     .item-title { font-weight: bold; font-size: 14px; color: #333; }
     .item-row { display: flex; gap: 10px; margin-bottom: 10px; }
     .item-row div { flex: 1; }
+    
+    /* 貼圖預覽選單 */
+    .sticker-dropdown {
+      position: relative;
+      width: 100%;
+    }
+    .sticker-selected {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px;
+      border: 1px solid #d2d2d7;
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+    }
+    .sticker-selected img, .sticker-option img {
+      width: 45px;
+      height: 45px;
+      object-fit: contain;
+    }
+    .sticker-options-box {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      max-height: 220px;
+      overflow-y: auto;
+      background: #fff;
+      border: 1px solid #d2d2d7;
+      border-radius: 8px;
+      z-index: 10;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .sticker-options-box.show {
+      display: block;
+    }
+    .sticker-option {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 8px;
+      cursor: pointer;
+      border-bottom: 1px solid #f5f5f7;
+    }
+    .sticker-option:hover {
+      background: #f5f5f7;
+    }
+
     .btn-delete {
       background-color: #e35050;
       color: white;
@@ -117,15 +167,11 @@
 <body>
 
 <div class="container">
-  <h2>Bubble HTML 多則動態產生器</h2>
+  <h2>Bubble 對話代碼產生器</h2>
   
   <div class="global-setting">
     <div>
-      <label>全域訊息日期</label>
-      <input type="text" id="globalDate" value="2026.07.11 토요일" placeholder="例如：2026.07.11 토요일">
-    </div>
-    <div>
-      <label>大頭貼設定</label>
+      <label>大頭貼頭像設定</label>
       <select id="globalAvatar">
         <option value="msg-avatar-1">頭像 1 (日常)</option>
         <option value="msg-avatar-2">頭像 2 (更新)</option>
@@ -135,34 +181,37 @@
 
   <div id="itemsContainer"></div>
 
-  <button class="btn-add" onclick="addItem()">➕ 新增一則泡泡規格</button>
-  <button class="btn-submit" onclick="generateAllHTML()">🚀 依照順序批次打包完整 HTML</button>
+  <button class="btn-add" onclick="addItem()">➕ 新增一則泡泡訊息</button>
+  <button class="btn-submit" onclick="generateAllHTML()">🚀 批次打包聊天泡泡代碼</button>
   
-  <div class="success-badge" id="successTxt">✅ 成功！已完美串聯畫面上所有訊息！</div>
+  <div class="success-badge" id="successTxt">✅ 打包成功！複製下方代碼去貼在 bubble-sm.html 即可！</div>
 
   <div class="output-section">
     <div class="output-header">
-      <label>最終產出 HTML 結果 (全選複製)：</label>
-      <button class="btn-copy" onclick="copyCode()">複製</button>
+      <label>產出的純泡泡代碼結果：</label>
+      <button class="btn-copy" onclick="copyCode()">複製結果</button>
     </div>
-    <textarea id="resultCode" readonly placeholder="點擊上方打包按鈕後，完整的代碼會出現在這裡..."></textarea>
+    <textarea id="resultCode" readonly placeholder="產出的純對話原始碼會顯示在這裡..."></textarea>
   </div>
 </div>
 
 <script>
   let itemCount = 0;
 
-  // 自動修正特殊的 .596Z 網址變成標準網址
-  function fixStickerUrl(url) {
-    if (!url) return '';
-    let cleanUrl = url.trim();
-    if (cleanUrl.includes('001.596Z')) {
-      return 'https://ntpcbaechu.github.io/mybubble/sticker/001.png';
-    }
-    return cleanUrl;
-  }
+  // 10張貼圖定義
+  const stickerData = [
+    { value: "https://ntpcbaechu.github.io/mybubble/sticker/001.png", title: "貼圖 001 (現有)" },
+    { value: "https://ntpcbaechu.github.io/mybubble/sticker/002.png", title: "貼圖 002 (待補)" },
+    { value: "https://ntpcbaechu.github.io/mybubble/sticker/003.png", title: "貼圖 003 (待補)" },
+    { value: "https://ntpcbaechu.github.io/mybubble/sticker/004.png", title: "貼圖 004 (待補)" },
+    { value: "https://ntpcbaechu.github.io/mybubble/sticker/005.png", title: "貼圖 005 (待補)" },
+    { value: "https://ntpcbaechu.github.io/mybubble/sticker/006.png", title: "貼圖 006 (待補)" },
+    { value: "https://ntpcbaechu.github.io/mybubble/sticker/007.png", title: "貼圖 007 (待補)" },
+    { value: "https://ntpcbaechu.github.io/mybubble/sticker/008.png", title: "貼圖 008 (待補)" },
+    { value: "https://ntpcbaechu.github.io/mybubble/sticker/009.png", title: "貼圖 009 (待補)" },
+    { value: "https://ntpcbaechu.github.io/mybubble/sticker/010.png", title: "貼圖 010 (待補)" }
+  ];
 
-  // 增加一個新的泡泡輸入區塊
   function addItem() {
     itemCount++;
     const container = document.getElementById('itemsContainer');
@@ -172,25 +221,25 @@
     
     card.innerHTML = `
       <div class="item-header">
-        <span class="item-title">📦 泡泡項目 #${itemCount}</span>
+        <span class="item-title">📦 泡泡訊息 #${itemCount}</span>
       </div>
       <div class="item-row">
         <div>
-          <label>時間 (例如:20:45)</label>
+          <label>時間 (例如:22:15)</label>
           <input type="text" class="item-time" placeholder="22:15">
         </div>
         <div>
-          <label>類型</label>
-          <select class="item-type" onchange="togglePlaceholder(this)">
+          <label>訊息類型</label>
+          <select class="item-type" onchange="togglePlaceholder(this, ${itemCount})">
             <option value="text">💬 純文字訊息</option>
             <option value="image">📸 藝人自拍照大圖</option>
-            <option value="sticker">🧸 貼圖網址</option>
+            <option value="sticker">🧸 貼圖網址 (看圖挑選)</option>
             <option value="fan">🗣️ 粉絲訊息 (右側)</option>
             <option value="reply">🔄 藝人回覆粉絲方框</option>
           </select>
         </div>
       </div>
-      <div>
+      <div class="content-block-area">
         <label class="content-label">內容 (長文換行不會被切開)</label>
         <textarea class="item-content" rows="3" placeholder="請輸入訊息文字..."></textarea>
       </div>
@@ -204,43 +253,89 @@
     if (el) el.remove();
   }
 
-  function togglePlaceholder(selectEl) {
-    const card = selectEl.closest('.item-card');
-    const textarea = card.querySelector('.item-content');
-    const label = card.querySelector('.content-label');
+  function togglePlaceholder(selectEl, id) {
+    const card = document.getElementById(`item_${id}`);
+    const blockArea = card.querySelector('.content-block-area');
     
-    if (selectEl.value === 'sticker' || selectEl.value === 'image') {
-      label.innerText = '圖片/貼圖網址 (會自動幫妳防呆修正格式)';
-      textarea.placeholder = 'https://ntpcbaechu.github.io/mybubble/...';
-    } else if (selectEl.value === 'reply') {
-      label.innerText = '回覆內容 (格式：粉絲的話|藝人的回覆)';
-      textarea.placeholder = '例如：回覆測試2-1|回覆測試2-2';
+    if (selectEl.value === 'sticker') {
+      let dropdownHTML = `
+        <label class="content-label">請選擇要使用的貼圖：</label>
+        <div class="sticker-dropdown">
+          <div class="sticker-selected" onclick="toggleStickerBox(${id})">
+            <img src="${stickerData[0].value}">
+            <span>${stickerData[0].title}</span>
+          </div>
+          <div class="sticker-options-box" id="stkBox_${id}">
+      `;
+      
+      stickerData.forEach((stk, i) => {
+        dropdownHTML += `
+          <div class="sticker-option" onclick="selectSticker(${id}, '${stk.value}', '${stk.title}')">
+            <img src="${stk.value}">
+            <span>${stk.title}</span>
+          </div>
+        `;
+      });
+      
+      dropdownHTML += `
+          </div>
+          <input type="hidden" class="item-content sticker-hidden-val" value="${stickerData[0].value}">
+        </div>
+      `;
+      blockArea.innerHTML = dropdownHTML;
     } else {
-      label.innerText = '內容 (長文換行不會被切開)';
-      textarea.placeholder = '請輸入訊息文字...';
+      let labelText = '內容 (長文換行不會被切開)';
+      let holderText = '請輸入訊息文字...';
+      
+      if (selectEl.value === 'image') {
+        labelText = '藝人自拍照圖片網址';
+        holderText = 'https://ntpcbaechu.github.io/mybubble/...';
+      } else if (selectEl.value === 'reply') {
+        labelText = '回覆內容 (格式：粉絲的話|藝人的回覆)';
+        holderText = '例如：回覆測試2-1|回覆測試2-2';
+      }
+      
+      blockArea.innerHTML = `
+        <label class="content-label">${labelText}</label>
+        <textarea class="item-content" rows="3" placeholder="${holderText}"></textarea>
+      `;
     }
   }
 
-  // 【核心修正：打包魔法】把畫面上所有泡泡串聯起來，不遺漏任何一則！
+  function toggleStickerBox(id) {
+    const box = document.getElementById(`stkBox_${id}`);
+    if(box) box.classList.toggle('show');
+  }
+
+  function selectSticker(id, val, title) {
+    const card = document.getElementById(`item_${id}`);
+    card.querySelector('.sticker-selected img').src = val;
+    card.querySelector('.sticker-selected span').innerText = title;
+    card.querySelector('.sticker-hidden-val').value = val;
+    document.getElementById(`stkBox_${id}`).classList.remove('show');
+  }
+
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.sticker-dropdown')) {
+      document.querySelectorAll('.sticker-options-box').forEach(box => box.classList.remove('show'));
+    }
+  });
+
   function generateAllHTML() {
     const cards = document.querySelectorAll('.item-card');
     if (cards.length === 0) {
-      alert('請至少新增一則泡泡項目再打包喔！');
+      alert('請先新增項目！');
       return;
     }
 
-    const gDate = document.getElementById('globalDate').value.trim();
     const gAvatar = document.getElementById('globalAvatar').value;
-    
-    // 開頭先加上整天的日期分隔線
-    let finalHTML = `<div class="bubble-date">${gDate}</div>\n`;
+    let finalHTML = "";
 
     cards.forEach((card, index) => {
       const time = card.querySelector('.item-time').value.trim() || '00:00';
       const type = card.querySelector('.item-type').value;
       let content = card.querySelector('.item-content').value;
       
-      // 判斷是不是連續發言（除了第一則以外，如果是藝人發的就加上 msg-continue 隱藏頭像）
       let isContinue = (index > 0 && type !== 'fan') ? ' msg-continue' : '';
 
       if (type === 'text') {
@@ -248,30 +343,28 @@
         finalHTML += `  <div class="msg msg-idol ${gAvatar}${isContinue}">
     <div class="msg-body">
       <div class="msg-wrapper">
-        <div class="msg-bubble">${formattedText}</div>
+        <div class="msg-bubble search-target">${formattedText}</div>
         <span class="msg-time">${time}</span>
       </div>
     </div>
   </div>\n`;
       } 
       else if (type === 'image') {
-        let imgUrl = fixStickerUrl(content);
         finalHTML += `  <div class="msg msg-idol ${gAvatar}${isContinue}">
     <div class="msg-body">
       <div class="msg-wrapper">
-        <img class="msg-bubble-img" src="${imgUrl}">
+        <img class="msg-bubble-img" src="${content.trim()}">
         <span class="msg-time">${time}</span>
       </div>
     </div>
   </div>\n`;
       } 
       else if (type === 'sticker') {
-        let stkUrl = fixStickerUrl(content);
         finalHTML += `  <div class="msg msg-idol ${gAvatar} msg-sticker${isContinue}">
     <div class="msg-body">
       <div class="msg-wrapper">
         <div class="msg-bubble">
-          <img class="msg-bubble-img" src="${stkUrl}">
+          <img class="msg-bubble-img" src="${content.trim()}">
         </div>
         <span class="msg-time">${time}</span>
       </div>
@@ -302,10 +395,10 @@
         finalHTML += `  <div class="msg msg-idol ${gAvatar}${isContinue}">
     <div class="msg-body">
       <div class="msg-wrapper">
-        <div class="msg-bubble">
+        <div class="msg-bubble search-target">
           <div class="msg-reply-box">
             <span class="msg-reply-title">ARTIST의 답장</span>
-            <span class="msg-reply-text">${fanPart}</span>
+            <span class="msg-reply-text search-target">${fanPart}</span>
           </div>
           ${idolPart}
         </div>
@@ -323,12 +416,10 @@
   function copyCode() {
     const copyText = document.getElementById("resultCode");
     copyText.select();
-    copyText.setSelectionRange(0, 99999);
     navigator.clipboard.writeText(copyText.value);
-    alert("代碼已成功複製！可以拿去貼到試算表或備份檔囉！");
+    alert("泡泡代碼已複製！");
   }
 
-  // 預設先給它送上一則初始方框
   addItem();
 </script>
 
