@@ -1,1 +1,387 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style> 
 
+    /* 「*」代表網頁上的所有人（所有標籤）。這行是把所有人預設的邊距（margin/padding）清空，
+       並規定外框計算方式（border-box），這樣設定幾像素（px）就是幾像素，最不容易排版錯位 */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    /* 控制整份網頁的底層架構（HTML 與 BODY 本體） */
+    html, body {
+      background-color: #efefef; /* Bubble App 經典的聊天背景色（淡淡的淺灰色） */
+      font-family: "Apple SD Gothic Neo", "SF Pro", -apple-system, BlinkMacSystemFont, sans-serif; /* 優先使用原生韓文與英數俐落字體 */
+      height: 100%; /* 強制讓網頁高度填滿整個手機螢幕 */
+      overflow-y: auto; /* 【防裁切魔法】如果訊息太多超過螢幕，自動開啟網頁內部的垂直捲動功能 */
+      -webkit-overflow-scrolling: touch; /* 讓 iPhone 或 Android 手機滑動這頁時，像內建 App 一樣絲滑順暢 */
+    }
+    
+    /* 單獨針對網頁身體（裝著對話框的區塊）微調 */
+    body {
+      padding: 75px 15px 15px 15px; /* 上方預留 75px 的肥肉邊距，防止訊息被固定在頂端的板頭擋住 */
+    }
+
+    /* 隱藏 Chrome 和 Safari 瀏覽器預設的粗粗灰色捲軸，維持 App 的視覺純淨感 */
+    html::-webkit-scrollbar, body::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* ==================== 板頭 Header 樣式 ==================== */
+    
+    /* 頂端白色的藝人名字列 */
+    .bubble-header {
+      position: fixed; /* 【釘住魔法】不管網頁怎麼往下滑，這條板頭都會死死固定在網頁最頂端 */
+      top: 0; /* 貼緊最上方 */
+      left: 0; /* 貼緊最左方 */
+      width: 100%; /* 寬度撐滿 100% 螢幕 */
+      background-color: #ffffff; /* 板頭背景為純白色 */
+      padding: 12px 16px 8px 16px; /* 設定內邊距：上12px、左右16px、下8px，撐出舒適的厚度 */
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05); /* 在板頭下方加一層極淡的陰影，看起來有立體浮空感 */
+      z-index: 1000; /* 把這層的圖層高度設為 1000，確保它永遠蓋在聊天訊息的最上面 */
+    }
+    
+    /* 板頭裡面裝文字的隱形容器 */
+    .header-container {
+      position: relative; /* 設為相對定位，好讓左右兩邊的圖標可以精準對齊它 */
+      width: 100%; /* 寬度百分之百 */
+      display: flex; /* 啟動彈性排版工具 */
+      flex-direction: column; /* 規定裡面的兩行文字必須「由上往下垂直排隊」 */
+      align-items: center; /* 讓裡面的文字水平居中 */
+      justify-content: center; /* 讓裡面的文字垂直居中 */
+    }
+
+    /* 藝人名字（민이🤍） */
+    .header-title {
+      font-size: 18px; /* 字體大小 18 像素 */
+      font-weight: bold; /* 字體加粗 */
+      color: #000000; /* 顏色為純黑 */
+      margin-bottom: 4px; /* 與下面那行 bubble + 9999 保持 4 像素的間距 */
+      text-align: center; /* 文字置中 */
+    }
+
+    /* 名字下面那行小字（bubble ♥ + 9999） */
+    .header-sub {
+      font-size: 11px; /* 字體縮小到 11 像素 */
+      font-weight: bold; /* 加粗 */
+      color: #000; /* 黑色 */
+      display: flex; /* 讓文字和粉紅愛心能水平排成一排 */
+      align-items: center; /* 垂直對齊置中 */
+      gap: 4px; /* 字母和小愛心之間空出 4 像素的間隙 */
+      text-align: center; /* 置中 */
+    }
+    /* 讓 bubble 這幾個字單獨變斜體 */
+    .header-sub em {
+      font-style: italic;
+      font-family: serif;
+      margin-right: 2px;
+    }
+
+    /* 專門控制小愛心 */
+    .heart-pink {
+      color: #ff8fa3; /* 把愛心塗成泡泡 App 標誌性的粉紅色 */
+      font-style: normal; /* 把剛剛外層設定的斜體字取消，讓愛心站直，不然歪歪的不好看 */
+    }
+
+    /* 左側返回圖標 ➔ 純 CSS 手工畫出的「＜」 */
+    .icon-back {
+      position: absolute; /* 絕對定位：脫離排隊隊伍，直接看標籤坐標 */
+      left: 0; /* 靠最左邊放 */
+      top: 4px; /* 距離頂端 4 像素 */
+      width: 12px; /* 寬 12 像素的正方形 */
+      height: 12px; /* 高 12 像素的正方形 */
+      border-top: 2px solid #000;  /* 幫正方形的「上邊」畫一條 2px 黑線 */
+      border-left: 2px solid #000; /* 幫正方形的「左邊」畫一條 2px 黑線 */
+      transform: rotate(-45deg); /* 【旋轉魔法】逆時針轉 45 度，原本的┌型就會變指向左邊的「＜」！ */
+      cursor: pointer; /* 滑鼠移上去時自動變成點擊的手指 */
+    }
+
+    /* 右側放大鏡和三個點的隱形外框 */
+    .header-icons {
+      position: absolute; /* 絕對定位 */
+      right: 0; /* 靠最右邊放 */
+      top: 4px; /* 距離頂端 4 像素 */
+      display: flex; /* 讓放大鏡和三個點「水平左右並排」 */
+      gap: 16px; /* 兩個圖標之間拉開 16 像素的距離 */
+      align-items: center; /* 垂直對齊置中 */
+    }
+
+    /* 放大鏡的「圓圈」本體 */
+    .icon-search {
+      width: 14px; /* 寬 14 像素 */
+      height: 14px; /* 高 14 像素 */
+      border: 2px solid #000; /* 四周畫上 2px 黑線（現在是個空心正方形） */
+      border-radius: 50%; /* 【圓形魔法】四個角磨圓 50%，正方形瞬間變成完美的「正圓形」！ */
+      position: relative; /* 相對定位，用來當把手小棍子的地基 */
+      cursor: pointer; /* 點擊手指 */
+    }
+    
+    /* 放大鏡右下角那根斜斜的「把手小棍子」 */
+    .icon-search::after {
+      content: ''; /* 憑空生出新零件的啟動指令 */
+      position: absolute; /* 絕對定位 */
+      width: 2px; /* 棍子寬 2 像素 */
+      height: 6px; /* 棍子長 6 像素 */
+      background: #000; /* 塗成純黑色 */
+      transform: rotate(-45deg); /* 把這根小直棍子旋轉 45 度變斜的 */
+      bottom: -4px; /* 往下移到圓圈外面的右下角 */
+      right: -2px; /* 往右移到圓圈外面的右下角，兩者拼起來就是放大鏡 🔍 */
+    }
+    
+    /* 三個點更多鍵的隱形外框 */
+    .icon-more {
+      display: flex; /* 彈性排版 */
+      flex-direction: column; /* 規定裡面的點點必須「由上往下垂直排一列」 */
+      gap: 3px; /* 每個點點之間空出 3 像素 */
+      cursor: pointer; /* 點擊手指 */
+    }
+    
+    /* 更多鍵裡面的「那三個黑點點本身」 */
+    .icon-more span {
+      width: 3px; /* 寬 3 像素的正方形 */
+      height: 3px; /* 高 3 像素的正方形 */
+      background-color: #000; /* 塗成黑色 */
+      border-radius: 50%; /* 四個角磨圓 50%，正方形就變成了小黑圓點，三顆直排就是 `⋮` */
+    }
+
+    /* ==================== 訊息共通樣式 ==================== */
+    
+    /* ==================== 韓文日期分隔線（帶兩側極細線） ==================== */
+    .bubble-date {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      font-size: 11px;
+      color: #8e8e93; /* 韓文版最原生的淡灰色 */
+      margin: 18px 0;
+    }
+    .bubble-date::before, .bubble-date::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #dbdbdb; /* 極細分隔線 */
+    }
+    .bubble-date::before { margin-right: 12px; }
+    .bubble-date::after { margin-left: 12px; }
+    
+    /* ==================== 聊天歷史紀錄基本骨架 ==================== */
+    .msg { display: flex; margin-bottom: 12px; align-items: flex-start; }
+    .msg-body { display: flex; flex-direction: column; max-width: 82%; }
+    .msg-wrapper { display: flex; align-items: flex-end; width: 100%; }
+    .msg-time { font-size: 9px; color: #a4a4a4; margin: 0 5px; white-space: nowrap; }
+    
+    /* 藝人名字：韓文原生深灰小字 */
+    .msg-idol:not(.msg-continue) .msg-body::before {
+      content: "민이🤍"; font-size: 11px; color: #4e4e4e; font-weight: 500; margin-bottom: 3px; display: block;
+    }
+
+    /* 藝人頭像（固定大頭貼） */
+    .msg-idol::before {
+      content: ""; width: 40px; height: 40px; border-radius: 16px; margin-right: 8px;
+      background-size: cover; background-position: center; flex-shrink: 0; display: block;
+    }
+    .msg-idol.msg-avatar-1::before { background-image: url("https://ntpcbaechu.github.io/mybubble/profile/1.JPG"); }
+    .msg-idol.msg-avatar-2::before { background-image: url("https://ntpcbaechu.github.io/mybubble/profile/2.jpg"); }
+
+    /* 連續發言（只在真正需要隱藏頭像名字時使用） */
+    .msg-idol.msg-continue { margin-top: -4px; }
+    .msg-idol.msg-continue::before { visibility: hidden; }
+
+    /* 藝人常規文字對話框 */
+    .msg-idol .msg-bubble {
+      background-color: #ffffff; color: #000000; font-size: 14px;
+      padding: 9px 13px; border-radius: 4px 15px 15px 15px; line-height: 1.4;
+    }
+
+    /* 自拍照大圖樣式（比照截圖：拉大到250px，四角呈現自然圓角） */
+    .msg-idol .msg-bubble-img {
+      width: 100%; max-width: 250px; height: auto; border-radius: 15px; object-fit: cover; display: block;
+    }
+
+    /* ───【變形特效 1：單獨發 Emoji 放大無框】─── */
+    .msg-idol.msg-only-emoji .msg-bubble {
+      background-color: transparent !important; box-shadow: none !important; padding: 0 !important; font-size: 45px; line-height: 1;
+    }
+
+    /* ───【變形特效 2：貼圖專用（去背、寬度嚴格鎖死 130px）】─── */
+    .msg-idol.msg-sticker .msg-bubble {
+      background-color: transparent !important; /* 拔除白色氣泡背景 */
+      box-shadow: none !important;
+      padding: 0 !important;
+    }
+    .msg-idol.msg-sticker .msg-bubble-img {
+      max-width: 130px; /* 【比照截圖判定】貼圖尺寸鎖死 130px，最精緻還原！ */
+      border-radius: 0; /* 貼圖自帶去背，不需要加圓角 */
+    }
+
+    /* ───【新結構：ARTIST의 답장（回覆粉絲小方框）】─── */
+    .msg-reply-box {
+      background-color: #f2f2f2; /* 引用框底色：淡淡的冷灰色 */
+      border-radius: 8px;
+      padding: 6px 10px;
+      margin-bottom: 6px; /* 與下方藝人自己說的話留下一點空隙 */
+    }
+    .msg-reply-title {
+      font-size: 10px;
+      font-weight: bold;
+      color: #000000; /* ARTIST의 답장 本體純黑加粗 */
+      display: block;
+      margin-bottom: 2px;
+    }
+    .msg-reply-text {
+      font-size: 12px;
+      color: #8e8e93; /* 粉絲說的話：淡灰色文字 */
+    }
+
+    /* 粉絲訊息（右側） */
+    .msg-fan { flex-direction: row-reverse; }
+    .msg-fan .msg-body { max-width: 75%; }
+    .msg-fan .msg-bubble {
+      background-color: #666666; color: #ffffff; font-size: 14px;
+      padding: 9px 13px; border-radius: 15px 4px 15px 15px; line-height: 1.4;
+    }
+  </style> 
+</head>
+
+<body> 
+
+  <header class="bubble-header">
+    <div class="header-container">
+      <div class="icon-back"></div> 
+      <div class="header-title">민이🤍</div> 
+      <div class="header-sub">
+        <em>bubble</em> <span class="heart-pink">♥</span> + 9999 
+      </div>
+      <div class="header-icons">
+        <div class="icon-search"></div> 
+        <div class="icon-more"><span></span><span></span></div> 
+      </div>
+    </div>
+  </header>
+
+  <div class="bubble-date">2024년 8월 19일 월요일</div> 
+  <div class="msg msg-idol msg-avatar-1">
+    <div class="msg-body">
+      <div class="msg-wrapper">
+        <div class="msg-bubble">안녕안녕 멍멍 승민이에요😀<br>앞으로 자주자주 연락해요오오오오오 자주올게요!!!!</div>
+        <span class="msg-time">21:45</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="bubble-date">2024년 8월 20일 화요일</div>
+  
+  <div class="msg msg-idol msg-avatar-1">
+    <div class="msg-body">
+      <div class="msg-wrapper">
+        <div class="msg-bubble">잘자!!!</div>
+        <span class="msg-time">01:13</span>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="msg msg-idol msg-avatar-1 msg-continue">
+    <div class="msg-body">
+      <div class="msg-wrapper">
+        <div class="msg-bubble">점심 챙겨먹오</div>
+        <span class="msg-time">12:43</span>
+      </div>
+    </div>
+  </div>
+
+  
+  <div class="msg msg-idol msg-avatar-1 msg-continue msg-sticker">
+    <div class="msg-body">
+      <div class="msg-wrapper">
+        <div class="msg-bubble">
+          <img class="msg-bubble-img" src="https://ntpcbaechu.github.io/mybubble/sticker/001.png">
+        </div>
+        <span class="msg-time">12:44</span>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="bubble-date">2026.07.10 금요일</div> 
+  <div class="msg msg-idol msg-avatar-1">
+    <div class="msg-body">
+      <div class="msg-wrapper">
+        <div class="msg-bubble">泡泡測試1</div> 
+        <span class="msg-time">22:15</span> 
+      </div>
+    </div>
+  </div>
+
+  <div class="msg msg-idol msg-avatar-1 msg-continue">
+    <div class="msg-body">
+      <div class="msg-wrapper">
+        <img class="msg-bubble-img" src="https://ntpcbaechu.github.io/mybubble/profile/2.jpg"> 
+        <span class="msg-time">22:15</span> 
+      </div>
+    </div>
+  </div>
+
+
+  <div class="msg msg-idol msg-avatar-1">
+    <div class="msg-body">
+      <div class="msg-wrapper">
+        <div class="msg-bubble">
+          <div class="msg-reply-box">
+            <span class="msg-reply-title">ARTIST의 답장</span>
+            <span class="msg-reply-text">回復測試1-1</span>
+          </div>
+          回復測試1-2
+        </div>
+        <span class="msg-time">23:42</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="bubble-date">2026.07.11 토요일</div> 
+  <div class="msg msg-idol msg-avatar-2">
+    <div class="msg-body">
+      <div class="msg-wrapper">
+        <div class="msg-bubble">(更新頭像) 泡泡測試3</div> 
+        <span class="msg-time">12:00</span> 
+      </div>
+    </div>
+  </div>
+
+  <div class="msg msg-idol msg-avatar-2 msg-continue">
+    <div class="msg-body">
+      <div class="msg-wrapper">
+        <img class="msg-bubble-img" src="https://ntpcbaechu.github.io/mybubble/profile/2.jpg"> 
+        <span class="msg-time">13:15</span> 
+      </div>
+    </div>
+  </div>
+
+  <div class="msg msg-idol msg-avatar-2 msg-sticker msg-continue">
+    <div class="msg-body">
+      <div class="msg-wrapper">
+        <div class="msg-bubble">
+          <img class="msg-bubble-img" src="https://ntpcbaechu.github.io/mybubble/profile/2.jpg"> 
+        </div>
+        <span class="msg-time">19:03</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="msg msg-idol msg-avatar-2">
+    <div class="msg-body">
+      <div class="msg-wrapper">
+        <div class="msg-bubble">
+          <div class="msg-reply-box">
+            <span class="msg-reply-title">ARTIST의 답장</span>
+            <span class="msg-reply-text">回復測試2-1</span>
+          </div>
+          回復測試2-2
+        </div>
+        <span class="msg-time">19:42</span>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
