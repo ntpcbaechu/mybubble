@@ -22,297 +22,78 @@
       display: none;
     }
 
-    /* ==================== 板頭 Header 樣式 ==================== */
+    /* 板頭 Header 樣式 */
     .bubble-header {
-      position: fixed; 
-      top: 0; 
-      left: 0; 
-      width: 100%; 
-      background-color: #ffffff; 
-      padding: 12px 16px 8px 16px; 
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05); 
-      z-index: 1000; 
+      position: fixed; top: 0; left: 0; width: 100%; background-color: #ffffff; 
+      padding: 12px 16px 8px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); z-index: 1000; 
     }
-    
-    .header-container {
-      position: relative; 
-      width: 100%; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      justify-content: center; 
-    }
-
-    /* 搜尋中隱藏原本的元素 */
-    .searching .normal-header-element {
-      display: none !important;
-    }
-
-    .header-title {
-      font-size: 18px; 
-      font-weight: bold; 
-      color: #000000; 
-      margin-bottom: 4px; 
-      text-align: center; 
-    }
-
-    .header-sub {
-      font-size: 11px; 
-      font-weight: bold; 
-      color: #000; 
-      display: flex; 
-      align-items: center; 
-      gap: 4px; 
-      text-align: center; 
-    }
-    .header-sub em {
-      font-style: italic;
-      font-family: serif;
-      margin-right: 2px;
-    }
-
+    .header-container { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .searching .normal-header-element { display: none !important; }
+    .header-title { font-size: 18px; font-weight: bold; color: #000000; margin-bottom: 4px; text-align: center; }
+    .header-sub { font-size: 11px; font-weight: bold; color: #000; display: flex; align-items: center; gap: 4px; text-align: center; }
+    .header-sub em { font-style: italic; font-family: serif; margin-right: 2px; }
     .heart-pink { color: #ff8fa3; font-style: normal; }
+    .icon-back { position: absolute; left: 0; top: 4px; width: 12px; height: 12px; border-top: 2px solid #000; border-left: 2px solid #000; transform: rotate(-45deg); cursor: pointer; }
+    .header-icons { position: absolute; right: 0; top: 4px; display: flex; gap: 16px; align-items: center; }
+    .icon-search { width: 14px; height: 14px; border: 2px solid #000; border-radius: 50%; position: relative; cursor: pointer; }
+    .icon-search::after { content: ''; position: absolute; width: 2px; height: 6px; background: #000; transform: rotate(-45deg); bottom: -4px; right: -2px; }
+    .icon-more { display: flex; flex-direction: column; gap: 3px; cursor: pointer; }
+    .icon-more span { width: 3px; height: 3px; background-color: #000; border-radius: 50%; }
 
-    .icon-back {
-      position: absolute; 
-      left: 0; 
-      top: 4px; 
-      width: 12px; 
-      height: 12px; 
-      border-top: 2px solid #000;  
-      border-left: 2px solid #000; 
-      transform: rotate(-45deg); 
-      cursor: pointer; 
-    }
+    /* 搜尋列 */
+    .search-bar-ui { display: none; width: 100%; align-items: center; gap: 12px; padding: 2px 0; }
+    .searching .search-bar-ui { display: flex !important; }
+    .search-input-wrapper { flex: 1; position: relative; background: #f5f5f7; border-radius: 10px; display: flex; align-items: center; padding: 8px 12px; }
+    .search-input { flex: 1; border: none; background: transparent; font-size: 15px; outline: none; color: #000; }
+    .search-cancel-btn { font-size: 15px; color: #000000; cursor: pointer; white-space: nowrap; }
 
-    .header-icons {
-      position: absolute; 
-      right: 0; 
-      top: 4px; 
-      display: flex; 
-      gap: 16px; 
-      align-items: center; 
-    }
+    /* 搜尋高亮 */
+    .bubble-match-gray { background-color: rgba(0, 0, 0, 0.15) !important; color: inherit !important; border-radius: 1px; }
+    .bubble-match-current { background-color: #000000 !important; color: #ffffff !important; border-radius: 1px; }
 
-    .icon-search {
-      width: 14px; 
-      height: 14px; 
-      border: 2px solid #000; 
-      border-radius: 50%; 
-      position: relative; 
-      cursor: pointer; 
-    }
-    .icon-search::after {
-      content: ''; 
-      position: absolute; 
-      width: 2px; 
-      height: 6px; 
-      background: #000; 
-      transform: rotate(-45deg); 
-      bottom: -4px; 
-      right: -2px; 
-    }
-    
-    .icon-more {
-      display: flex; 
-      flex-direction: column; 
-      gap: 3px; 
-      cursor: pointer; 
-    }
-    .icon-more span {
-      width: 3px; 
-      height: 3px; 
-      background-color: #000; 
-      border-radius: 50%; 
-    }
-
-    /* ==================== 🔍 原生滿版搜尋列 ==================== */
-    .search-bar-ui {
-      display: none;
-      width: 100%;
-      align-items: center;
-      gap: 12px;
-      padding: 2px 0;
-    }
-    .searching .search-bar-ui {
-      display: flex !important;
-    }
-    .search-input-wrapper {
-      flex: 1;
-      position: relative;
-      background: #f5f5f7;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      padding: 8px 12px;
-    }
-    .search-input-wrapper ::placeholder {
-      color: #b1b1b5;
-    }
-    .search-input-wrapper .search-icon-inside {
-      width: 12px;
-      height: 12px;
-      border: 1.5px solid #b1b1b5;
-      border-radius: 50%;
-      position: relative;
-      margin-right: 8px;
-    }
-    .search-input-wrapper .search-icon-inside::after {
-      content: '';
-      position: absolute;
-      width: 1.5px;
-      height: 4px;
-      background: #b1b1b5;
-      transform: rotate(-45deg);
-      bottom: -3px;
-      right: -1px;
-    }
-    .search-input {
-      flex: 1;
-      border: none;
-      background: transparent;
-      font-size: 15px;
-      outline: none;
-      color: #000;
-    }
-    .search-cancel-btn {
-      font-size: 15px;
-      color: #000000;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    /* ==================== 雙色搜尋高亮邏輯 ==================== */
-    .bubble-match-gray {
-      background-color: rgba(0, 0, 0, 0.15) !important;
-      color: inherit !important;
-      border-radius: 1px;
-    }
-    .bubble-match-current {
-      background-color: #000000 !important;
-      color: #ffffff !important;
-      border-radius: 1px;
-    }
-
-    /* ==================== 訊息共通樣式 ==================== */
-    .bubble-date {
-      display: flex;
-      align-items: center;
-      text-align: center;
-      font-size: 11px;
-      color: #8e8e93; 
-      margin: 18px 0;
-    }
-    .bubble-date::before, .bubble-date::after {
-      content: '';
-      flex: 1;
-      border-bottom: 1px solid #dbdbdb; 
-    }
+    /* 訊息樣式 */
+    .bubble-date { display: flex; align-items: center; text-align: center; font-size: 11px; color: #8e8e93; margin: 18px 0; }
+    .bubble-date::before, .bubble-date::after { content: ''; flex: 1; border-bottom: 1px solid #dbdbdb; }
     .bubble-date::before { margin-right: 12px; }
     .bubble-date::after { margin-left: 12px; }
-    
     .msg { display: flex; margin-bottom: 12px; align-items: flex-start; }
     .msg-body { display: flex; flex-direction: column; max-width: 82%; }
     .msg-wrapper { display: flex; align-items: flex-end; width: 100%; }
     .msg-time { font-size: 9px; color: #a4a4a4; margin: 0 5px; white-space: nowrap; }
-    
-    .msg-idol:not(.msg-continue) .msg-body::before {
-      content: "민이🤍"; font-size: 11px; color: #4e4e4e; font-weight: 500; margin-bottom: 3px; display: block;
-    }
-
-    .msg-idol::before {
-      content: ""; width: 40px; height: 40px; border-radius: 16px; margin-right: 8px;
-      background-size: cover; background-position: center; flex-shrink: 0; display: block;
-    }
+    .msg-idol:not(.msg-continue) .msg-body::before { content: "민이🤍"; font-size: 11px; color: #4e4e4e; font-weight: 500; margin-bottom: 3px; display: block; }
+    .msg-idol::before { content: ""; width: 40px; height: 40px; border-radius: 16px; margin-right: 8px; background-size: cover; background-position: center; flex-shrink: 0; display: block; }
     .msg-idol.msg-avatar-1::before { background-image: url("https://ntpcbaechu.github.io/mybubble/profile/1.JPG"); }
     .msg-idol.msg-avatar-2::before { background-image: url("https://ntpcbaechu.github.io/mybubble/profile/2.jpg"); }
-
     .msg-idol.msg-continue { margin-top: -4px; }
     .msg-idol.msg-continue::before { visibility: hidden; }
-
-    .msg-idol .msg-bubble {
-      background-color: #ffffff; color: #000000; font-size: 14px;
-      padding: 9px 13px; border-radius: 4px 15px 15px 15px; line-height: 1.4;
-    }
-
-    .msg-idol .msg-bubble-img {
-      width: 100%; max-width: 250px; height: auto; border-radius: 15px; object-fit: cover; display: block;
-    }
-
-    .msg-idol.msg-sticker .msg-bubble {
-      background-color: transparent !important; 
-      box-shadow: none !important;
-      padding: 0 !important;
-    }
-    .msg-idol.msg-sticker .msg-bubble-img {
-      max-width: 130px; 
-      border-radius: 0; 
-    }
-
-    .msg-reply-box {
-      background-color: #f2f2f2; 
-      border-radius: 8px;
-      padding: 6px 10px;
-      margin-bottom: 6px; 
-    }
-    .msg-reply-title {
-      font-size: 10px;
-      font-weight: bold;
-      color: #000000; 
-      display: block;
-      margin-bottom: 2px;
-    }
-    .msg-reply-text {
-      font-size: 12px;
-      color: #8e8e93; 
-    }
-
+    .msg-idol .msg-bubble { background-color: #ffffff; color: #000000; font-size: 14px; padding: 9px 13px; border-radius: 4px 15px 15px 15px; line-height: 1.4; }
+    .msg-idol .msg-bubble-img { width: 100%; max-width: 250px; height: auto; border-radius: 15px; object-fit: cover; display: block; }
+    .msg-idol.msg-sticker .msg-bubble { background-color: transparent !important; box-shadow: none !important; padding: 0 !important; }
+    .msg-idol.msg-sticker .msg-bubble-img { max-width: 130px; border-radius: 0; }
+    .msg-reply-box { background-color: #f2f2f2; border-radius: 8px; padding: 6px 10px; margin-bottom: 6px; }
+    .msg-reply-title { font-size: 10px; font-weight: bold; color: #000000; display: block; margin-bottom: 2px; }
+    .msg-reply-text { font-size: 12px; color: #8e8e93; }
     .msg-fan { flex-direction: row-reverse; }
     .msg-fan .msg-body { max-width: 75%; }
-    .msg-fan .msg-bubble {
-      background-color: #666666; color: #ffffff; font-size: 14px;
-      padding: 9px 13px; border-radius: 15px 4px 15px 15px; line-height: 1.4;
-    }
-
-    .search-nav-footer {
-      display: none;
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      background: #ffffff;
-      border-top: 1px solid #dbdbdb;
-      padding: 10px;
-      justify-content: space-around;
-      z-index: 1000;
-    }
-    .searching .search-nav-footer {
-      display: flex !important;
-    }
-    .nav-arrow {
-      font-size: 20px;
-      cursor: pointer;
-      color: #333;
-      padding: 5px 20px;
-    }
+    .msg-fan .msg-bubble { background-color: #666666; color: #ffffff; font-size: 14px; padding: 9px 13px; border-radius: 15px 4px 15px 15px; line-height: 1.4; }
+    
+    .search-nav-footer { display: none; position: fixed; bottom: 0; left: 0; width: 100%; background: #ffffff; border-top: 1px solid #dbdbdb; padding: 10px; justify-content: space-around; z-index: 1000; }
+    .searching .search-nav-footer { display: flex !important; }
+    .nav-arrow { font-size: 20px; cursor: pointer; color: #333; padding: 5px 20px; }
   </style> 
 </head>
 
 <body> 
-
   <header class="bubble-header" id="mainHeader">
     <div class="header-container normal-header-element">
       <div class="icon-back"></div> 
       <div class="header-title">민이🤍</div> 
-      <div class="header-sub">
-        <em>bubble</em> <span class="heart-pink">♥</span> + <span id="autoDNum">---</span>
-      </div>
+      <div class="header-sub"><em>bubble</em> <span class="heart-pink">♥</span> + <span id="autoDNum">---</span></div>
       <div class="header-icons">
         <div class="icon-search" onclick="openSearchUI()"></div> 
         <div class="icon-more"><span></span><span></span></div> 
       </div>
     </div>
-
     <div class="search-bar-ui">
       <div class="search-input-wrapper">
         <div class="search-icon-inside"></div>
@@ -324,121 +105,43 @@
 
   <div class="bubble-date">2024년 8월 19일 월요일</div> 
   <div class="msg msg-idol msg-avatar-1">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <div class="msg-bubble search-target">안녕안녕 멍멍 승민이에요😀<br>앞으로 자주자주 연락해요오오오오오 자주올게요!!!!</div>
-        <span class="msg-time">21:45</span>
-      </div>
-    </div>
+    <div class="msg-body"><div class="msg-wrapper"><div class="msg-bubble search-target">안녕안녕 멍멍 승민이에요😀<br>앞으로 자주자주 연락해요오오오오오 자주올게요!!!!</div><span class="msg-time">21:45</span></div></div>
   </div>
 
   <div class="bubble-date">2024년 8월 20일 화요일</div>
   <div class="msg msg-idol msg-avatar-1">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <div class="msg-bubble search-target">잘자!!!</div>
-        <span class="msg-time">01:13</span>
-      </div>
-    </div>
+    <div class="msg-body"><div class="msg-wrapper"><div class="msg-bubble search-target">잘자!!!</div><span class="msg-time">01:13</span></div></div>
   </div>
-  
   <div class="msg msg-idol msg-avatar-1 msg-continue">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <div class="msg-bubble search-target">점심 챙겨먹오</div>
-        <span class="msg-time">12:43</span>
-      </div>
-    </div>
+    <div class="msg-body"><div class="msg-wrapper"><div class="msg-bubble search-target">점심 챙겨먹오</div><span class="msg-time">12:43</span></div></div>
   </div>
-
   <div class="msg msg-idol msg-avatar-1 msg-sticker msg-continue">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <div class="msg-bubble">
-          <img class="msg-bubble-img" src="https://ntpcbaechu.github.io/mybubble/sticker/001.png">
-        </div>
-        <span class="msg-time">12:44</span>
-      </div>
-    </div>
+    <div class="msg-body"><div class="msg-wrapper"><div class="msg-bubble"><img class="msg-bubble-img" src="https://ntpcbaechu.github.io/mybubble/sticker/001.png"></div><span class="msg-time">12:44</span></div></div>
   </div>
 
   <div class="bubble-date">2026.07.10 금요일</div> 
   <div class="msg msg-idol msg-avatar-1">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <div class="msg-bubble search-target">泡泡測試1</div> 
-        <span class="msg-time">22:15</span> 
-      </div>
-    </div>
+    <div class="msg-body"><div class="msg-wrapper"><div class="msg-bubble search-target">泡泡測試1</div><span class="msg-time">22:15</span></div></div>
   </div>
-
   <div class="msg msg-idol msg-avatar-1 msg-continue">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <img class="msg-bubble-img" src="https://ntpcbaechu.github.io/mybubble/profile/2.jpg"> 
-        <span class="msg-time">22:15</span> 
-      </div>
-    </div>
+    <div class="msg-body"><div class="msg-wrapper"><img class="msg-bubble-img" src="https://ntpcbaechu.github.io/mybubble/profile/2.jpg"><span class="msg-time">22:15</span></div></div>
   </div>
-
   <div class="msg msg-idol msg-avatar-1">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <div class="msg-bubble search-target">
-          <div class="msg-reply-box">
-            <span class="msg-reply-title">ARTIST의 답장</span>
-            <span class="msg-reply-text search-target">回復測試1-1</span>
-          </div>
-          回復測試1-2
-        </div>
-        <span class="msg-time">23:42</span>
-      </div>
-    </div>
+    <div class="msg-body"><div class="msg-wrapper"><div class="msg-bubble search-target"><div class="msg-reply-box"><span class="msg-reply-title">ARTIST의 답장</span><span class="msg-reply-text search-target">回復測試1-1</span></div>回復測試1-2</div><span class="msg-time">23:42</span></div></div>
   </div>
 
   <div class="bubble-date">2026.07.11 토요일</div> 
   <div class="msg msg-idol msg-avatar-2">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <div class="msg-bubble search-target">(更新頭像) 泡泡測試3</div> 
-        <span class="msg-time">12:00</span> 
-      </div>
-    </div>
+    <div class="msg-body"><div class="msg-wrapper"><div class="msg-bubble search-target">(更新頭像) 泡泡測試3</div><span class="msg-time">12:00</span></div></div>
   </div>
-
   <div class="msg msg-idol msg-avatar-2 msg-continue">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <img class="msg-bubble-img" src="https://ntpcbaechu.github.io/mybubble/profile/2.jpg"> 
-        <span class="msg-time">13:15</span> 
-      </div>
-    </div>
+    <div class="msg-body"><div class="msg-wrapper"><img class="msg-bubble-img" src="https://ntpcbaechu.github.io/mybubble/profile/2.jpg"><span class="msg-time">13:15</span></div></div>
   </div>
-
   <div class="msg msg-idol msg-avatar-2 msg-sticker msg-continue">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <div class="msg-bubble">
-          <img class="msg-bubble-img" src="https://ntpcbaechu.github.io/mybubble/profile/2.jpg"> 
-        </div>
-        <span class="msg-time">19:03</span>
-      </div>
-    </div>
+    <div class="msg-body"><div class="msg-wrapper"><div class="msg-bubble"><img class="msg-bubble-img" src="https://ntpcbaechu.github.io/mybubble/profile/2.jpg"></div><span class="msg-time">19:03</span></div></div>
   </div>
-
   <div class="msg msg-idol msg-avatar-2">
-    <div class="msg-body">
-      <div class="msg-wrapper">
-        <div class="msg-bubble search-target">
-          <div class="msg-reply-box">
-            <span class="msg-reply-title">ARTIST의 답장</span>
-            <span class="msg-reply-text search-target">回復測試2-1</span>
-          </div>
-          回復測試2-2
-        </div>
-        <span class="msg-time">19:42</span>
-      </div>
-    </div>
+    <div class="msg-body"><div class="msg-wrapper"><div class="msg-bubble search-target"><div class="msg-reply-box"><span class="msg-reply-title">ARTIST의 답장</span><span class="msg-reply-text search-target">回復測試2-1</span></div>回復測試2-2</div><span class="msg-time">19:42</span></div></div>
   </div>
 
   <div class="search-nav-footer">
@@ -447,7 +150,6 @@
   </div>
 
   <script>
-    // 1. 自動天數計算
     function updateBubbleDays() {
       const startDate = new Date('2024-08-19');
       const today = new Date();
@@ -457,99 +159,46 @@
     }
     updateBubbleDays();
 
-    // 2. 搜尋 UI 切換控制
-    function openSearchUI() {
-      document.getElementById('mainHeader').classList.add('searching');
-      document.body.classList.add('searching');
-      document.getElementById('searchInput').focus();
-    }
+    function openSearchUI() { document.getElementById('mainHeader').classList.add('searching'); document.body.classList.add('searching'); document.getElementById('searchInput').focus(); }
+    function closeSearchUI() { document.getElementById('mainHeader').classList.remove('searching'); document.body.classList.remove('searching'); document.getElementById('searchInput').value = ''; clearAllHighlights(); resetSearchEngine(); }
 
-    function closeSearchUI() {
-      document.getElementById('mainHeader').classList.remove('searching');
-      document.body.classList.remove('searching');
-      document.getElementById('searchInput').value = '';
-      clearAllHighlights();
-      resetSearchEngine();
-    }
-
-    // 3. 核心搜尋雙底色邏輯
-    let currentMatchIndex = -1;
-    let matchedElements = [];
-    let lastQuery = "";
-
-    function resetSearchEngine() {
-      currentMatchIndex = -1;
-      matchedElements = [];
-      lastQuery = "";
-    }
-
+    let currentMatchIndex = -1; let matchedElements = []; let lastQuery = "";
+    function resetSearchEngine() { currentMatchIndex = -1; matchedElements = []; lastQuery = ""; }
     function clearAllHighlights() {
-      const targets = document.querySelectorAll('.search-target');
-      targets.forEach(el => {
-        if (el.hasAttribute('data-original-html')) {
-          el.innerHTML = el.getAttribute('data-original-html');
-          el.removeAttribute('data-original-html');
-        }
+      document.querySelectorAll('.search-target').forEach(el => {
+        if (el.hasAttribute('data-original-html')) { el.innerHTML = el.getAttribute('data-original-html'); el.removeAttribute('data-original-html'); }
       });
     }
-
-    function handleSearchKeyDown(e) {
-      if (e.key === 'Enter') {
-        runSearchLogic();
-      }
-    }
-
+    function handleSearchKeyDown(e) { if (e.key === 'Enter') runSearchLogic(); }
     function runSearchLogic() {
       const query = document.getElementById('searchInput').value.trim();
       if (!query) return;
-
       if (query !== lastQuery) {
-        clearAllHighlights();
-        lastQuery = query;
-        currentMatchIndex = -1;
-
-        const targets = document.querySelectorAll('.search-target');
-        targets.forEach(el => {
+        clearAllHighlights(); lastQuery = query; currentMatchIndex = -1;
+        document.querySelectorAll('.search-target').forEach(el => {
           let htmlContent = el.innerHTML;
           if (htmlContent.includes(query)) {
-            if (!el.hasAttribute('data-original-html')) {
-              el.setAttribute('data-original-html', htmlContent);
-            }
+            if (!el.hasAttribute('data-original-html')) el.setAttribute('data-original-html', htmlContent);
             const regex = new RegExp(`(${escapeRegExp(query)})`, 'g');
             el.innerHTML = htmlContent.replace(regex, `<mark class="bubble-match-gray">$1</mark>`);
           }
         });
-
         matchedElements = document.querySelectorAll('.bubble-match-gray');
-        if (matchedElements.length === 0) {
-          alert("沒有找到符合的聊天內容");
-          return;
-        }
+        if (matchedElements.length === 0) { alert("沒有找到符合的聊天內容"); return; }
       }
-
       navigateSearch(1);
     }
-
     function navigateSearch(direction) {
       if (matchedElements.length === 0) return;
-
-      if (currentMatchIndex >= 0 && currentMatchIndex < matchedElements.length) {
-        matchedElements[currentMatchIndex].className = 'bubble-match-gray';
-      }
-
+      if (currentMatchIndex >= 0 && currentMatchIndex < matchedElements.length) matchedElements[currentMatchIndex].className = 'bubble-match-gray';
       currentMatchIndex += direction;
       if (currentMatchIndex >= matchedElements.length) currentMatchIndex = 0;
       if (currentMatchIndex < 0) currentMatchIndex = matchedElements.length - 1;
-
       const targetEl = matchedElements[currentMatchIndex];
       targetEl.className = 'bubble-match-current';
-
       targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-
-    function escapeRegExp(string) {
-      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
+    function escapeRegExp(string) { return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
   </script>
 </body>
 </html>
